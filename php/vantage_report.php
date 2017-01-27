@@ -1,11 +1,14 @@
 <?php
+require_once 'vendor/autoload.php';
+
 $now = time();
 $yesterday = $now - (24 * 60 * 60);
 
 echo '{"Timestamp":' . $now . ',"Vantages":[';
 
-//open driver manager
+//open driver manager and geoip reader
 $manager = new MongoDB\Driver\Manager('mongodb://localhost:27017');
+$reader = new GeoIp2\Database\Reader('/usr/local/share/GeoLite2/GeoLite2-City.mmdb');
 
 //query for distinct hostnames
 $cursor = $manager->executeCommand(
@@ -45,9 +48,10 @@ for ($i=0; $i < count($array); ++$i) {
     for ($j=0; $j < count($ipArray); ++$j) {
         $ipAddress = $ipArray[$j];
 
-        //TODO geolocation ip address
+        //geolocation ip address
+        $record = $reader->city($ipAddress);
 
-        echo ($j != 0 ? ',' : '') . '{"IpAddress":"'. $ipAddress . '"}';
+        echo ($j != 0 ? ',' : '') . '{"IpAddress":"'. $ipAddress . '","Latitude":' . $record->location->latitude . ',"Longitude":' . $record->location->longitude . '}';
     }
 
     echo ']';
