@@ -4,6 +4,7 @@
         <title>Proddle - Vantage</title>
         <link rel="stylesheet" type="text/css" href="css/proddle.css" />
         <link rel="stylesheet" type="text/css" href="css/map-report.css" />
+        <script src="https://ajax.googleapis.com/ajax/libs/jquery/3.1.1/jquery.min.js"></script>
     </head>
     <body>
         <?php
@@ -20,28 +21,79 @@
         </div>
 
         <script>
+            var map;
+            var infoWindow;
+
             function initMap() {
-                var map = new google.maps.Map(document.getElementById('map'), {
+                infoWindow = new google.maps.InfoWindow;
+                map = new google.maps.Map(document.getElementById('map'), {
                     center: {lat:0, lng: 0},
                     zoom: 2
                 });
 
                 var table = document.createElement('table');
 
-                //add data to table
-                var tr = table.insertRow();
-                tr.insertCell().appendChild(document.createTextNode('test (129.82.138.20)'));
-                tr.insertCell().appendChild(document.createTextNode('http-get'));
-                tr.insertCell().appendChild(document.createTextNode('1387'));
-
                 //add table header
                 var headerColumns = ['Vantage', 'Measurement', 'Count'];
-                var tableHeader = table.createTHead().insertRow();
+                var tr = table.insertRow();
                 for (var i=0; i<headerColumns.length; i++) {
-                    tableHeader.insertCell().appendChild(document.createTextNode(headerColumns[i]));
+                    var th = document.createElement('th');
+                    th.appendChild(document.createTextNode(headerColumns[i]));
+                    tr.appendChild(th);
                 }
 
+                //query php/vantage_report.php
+                $.get({
+                    url: 'vantage_report.html',
+                    dataType: 'json',
+                    success: function(data) {
+                        for (var i=0; i < data.length; i++) {
+                            var vantage = data[i];
+
+                            var tr = table.insertRow();
+
+                            //print hostname and ip addresses
+                            var ipAddresses = '';
+                            for (var j=0; j < vantage.IpAddresses.length; j++) {
+                                var ipAddress = vantage.IpAddresses[j];
+                                ipAddresses += (j != 0 ? ', ' : '') + ipAddress.IpAddress;
+
+                                addMarker(vantage.Hostname, ipAddress.IpAddress, ipAddress.Latitude, ipAddress.Longitude);
+                            }
+                            tr.insertCell().appendChild(document.createTextNode(vantage.Hostname + ' (' + ipAddresses + ')'));
+
+                            //print measurements
+                            for (var j=0; j < vantage.Measurements.length; j++) {
+                                if (j != 0) {
+                                    tr = table.insertRow();
+                                    tr.insertCell();
+                                }
+
+                                tr.insertCell().appendChild(document.createTextNode(vantage.Measurements[j].Measurement));
+                                tr.insertCell().appendChild(document.createTextNode(vantage.Measurements[j].Count));
+                            }
+                        }
+                    }
+                });
+
                 document.getElementById('report').appendChild(table);
+            }
+
+            function addMarker(hostname, ipAddress, latitude, longitude) {
+                var marker = new google.maps.Marker({
+                    position: {lat: latitude, lng: longitude},
+                    label: hostname.toUpperCase()[0],
+                    map: map,
+                    clickable: true
+                });
+
+                google.maps.event.addListener(marker, 'click', function() {
+                    infoWindow.setContent('<div id=content>' +
+                        '<strong>' + hostname + '</strong>' +
+                        '<br>' + ipAddress +
+                        '</div>');
+                    infoWindow.open(map, marker);
+                });
             }
         </script>
 

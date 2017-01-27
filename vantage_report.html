@@ -1,10 +1,9 @@
 <?php
-require_once 'vendor/autoload.php';
+require_once 'php/vendor/autoload.php';
 
-$now = time();
-$yesterday = $now - (24 * 60 * 60);
+$yesterday = time() - (24 * 60 * 60);
 
-echo '{"Timestamp":' . $now . ',"Vantages":[';
+echo '[';
 
 //open driver manager and geoip reader
 $manager = new MongoDB\Driver\Manager('mongodb://localhost:27017');
@@ -94,5 +93,5 @@ for ($i=0; $i < count($array); ++$i) {
     echo ']}';
 }
 
-echo ']}';
+echo ']';
 ?>
