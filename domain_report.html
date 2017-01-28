@@ -34,9 +34,21 @@ for ($i=0; $i < count($array); ++$i) {
     echo ',"Hostname":"' . $result->Hostname . '"';
     echo ',"Domain":"' . $result->Domain . '"';
     echo ',"IpAddress":"' . $result->IpAddress . '"';
-    echo ',"Latitude":' . $record->location->latitude . '';
-    echo ',"Longitude":' . $record->location->longitude . '';
+    echo ',"Latitude":' . $record->location->latitude;
+    echo ',"Longitude":' . $record->location->longitude;
     echo ',"Measurement":"' . $result->Measurement . '"';
+    echo ',"Error":' . ($result->Error ? 'true' : 'false');
+
+    if (isset($result->Result)) {
+        if (isset($result->Result->DomainIp)) {
+            $domainRecord = $reader->city($result->Result->DomainIp);
+
+            $result->Result->Latitude = $domainRecord->location->latitude;
+            $result->Result->Longitude = $domainRecord->location->longitude;
+        }
+
+        echo ',"Result":' . MongoDB\BSON\toJSON(MongoDB\BSON\fromPHP($result->Result));
+    }
 
     echo '}';
 }
