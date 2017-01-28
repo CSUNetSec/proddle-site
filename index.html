@@ -12,15 +12,83 @@
         <div id="center">
             <h3>Overview</h3>
             <p>
-                TODO - fill out some information on Proddle.
+                Proddle is a distributed network measurement project running
+                at Colorado State University in the Network Security research
+                group. The aim of the project is to perform periodic service
+                level measurements from geographically diverse vantage points
+                to determine DDoS and similar networking
+                anomalies. There are many well established projects actively 
+                probing the Internet. While Proddle offers the ability to 
+                perform network level measurements (ping, traceroute, etc) we
+                propose analyzing a higher layer to closer mimic user interaction.
+                Therefore, in additon to performing network layer measurements 
+                provided by existing infrastructure, we'll provide the ability
+                to perform much more versatile measurements.
             </p>
 
-            <h3>Developers</h3>
+            <h3>Results</h3>
+            <p>
+                To begin, as a research centric project all results are made
+                publicly available. We believe this is a dataset that's currently
+                unavailable to the broader community and has the potential to 
+                spark new and interesting research initiatives. Results are
+                stored as JSON strings, but we are willing to provide a different
+                format for interested parties. Feel free to contact us.
+            </p>
+
+            <p>
+                As stated previously, all results are stored in JSON format. This
+                allows for an unparalleled level of verbosity. Our current HTTP
+                GET measurement stores application layer latency, DNS resolution,
+                redirect count, reply content, HTTP status codes, and much more.
+            </p>
+
+            <h3>Collaboration</h3>
+            <p>
+                There are many ways for interested parties to aid this effort.
+                The most obvious being deploying a vantage point locally. As
+                the project is in it's infancy this is a fairly manual process,
+                but intial efforts at containerizing the application using docker
+                have been fairly success. Another mutually useful effort would 
+                be to use the data for interesting research. we are quite 
+                happy to entertain alternative formats on request. Any additional
+                thoughts on increasing the communites scope of the project will
+                be well recieved. 
+            </p>
+
+            <h3>Architecture</h3>
+            <p>
+                The architecture is covered extesively in the 
+                <a href="documentation.html">documentation</a> section. Alas
+                a brief description will be provided here. Our backend is run
+                by <a href="https://www.mongodb.com/">MongoDB</a>. It is a very
+                interesting project that stores information in JSON documents.
+                Additionally it provides data replication and sharding required
+                of most modern database deployments. On top of that we have
+                implemented a very lightweight server application that acts as
+                a passive entity, meaning all communication is initiated by the
+                vantage points. The server handles all communication between the
+                vantage points and MongoDB. The final component is the vantage
+                point. It's purpose is to actively perform measurements and relay
+                results to servers. It should be noted that implementation is such
+                that multiple servers will be running over a MongoDB replication
+                cluster. Therefore the system has a fail-safe in the case of 
+                unreachability.
+            </p>
+
+            <h3>Team</h3>
+            <p>
+                The team currently consists of researchers at Colorado State
+                University in the Network Security group. We are very open to 
+                collaborative efforts and urge all interested parties to contact
+                us.
+            </p>
+
             <ul>
-                <li>Dan Rammer (PhD Student - CSU)</li>
-                <li>Dimitris Kounalakis (Research Associate - CSU)</li>
-                <li>Spiros Thanasoulas (Research Associate - CSU)</li>
-                <li>Christos Papadopoulas (Professor/Advisor - CSU)</li>
+                <li>Dan Rammer (PhD Student - Colorado State University)</li>
+                <li>Dimitris Kounalakis (Research Associate - Colorado State University)</li>
+                <li>Spiros Thanasoulas (Research Associate - Colorado State University)</li>
+                <li>Christos Papadopoulas (Professor/Advisor - Colorado State University)</li>
             </ul>
         </div>
     </body>

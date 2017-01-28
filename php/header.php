@@ -8,7 +8,6 @@ echo <<<_END
     <div id="navbar">
         <ul>
             <li><a href="index.html">Home</a></li>
-            <li><a href="index.html#Developers">Developers</a></li>
             <li><a href="vantage.html">Vantage</a></li>
             <li><a href="domain.html">Domain</a></li>
             <li><a href="documentation.html">Documentation</a></li>
