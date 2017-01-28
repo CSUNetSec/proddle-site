@@ -9,10 +9,9 @@ echo <<<_END
         <ul>
             <li><a href="index.html">Home</a></li>
             <li><a href="index.html#Developers">Developers</a></li>
-            <li><a href="index.html">Blog</a></li>
-            <li><a href="index.html">Vantage</a></li>
-            <li><a href="index.html">Domain</a></li>
-            <li><a href="index.html">Documentation</a></li>
+            <li><a href="vantage.html">Vantage</a></li>
+            <li><a href="domain.html">Domain</a></li>
+            <li><a href="documentation.html">Documentation</a></li>
         </ul>
     </div>
 </div>
