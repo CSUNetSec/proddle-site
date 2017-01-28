@@ -1,3 +1,7 @@
+* {
+    font-family: Arial;
+}
+
 div#header {
     background: #FFFFFF;
     position: fixed;

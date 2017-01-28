@@ -9,6 +9,11 @@ div#report table {
     text-align: center;
 }
 
+div#report thead {
+    border: 1px solid black;
+    background-color: lightgrey;
+}
+
 div#report td {
     border: 1px solid black;
 }

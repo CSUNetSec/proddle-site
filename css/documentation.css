@@ -1,0 +1,13 @@
+div#docbar {
+    position: absolute;
+    left: 0px;
+    top: 0px;
+    width: 10%;
+}
+
+div#docpane {
+    position: absolute;
+    right: 0px;
+    top: 0px;
+    width: 80%;
+}
