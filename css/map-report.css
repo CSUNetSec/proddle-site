@@ -1,0 +1,14 @@
+div#map {
+    height: 600px;
+}
+
+div#report table {
+    border: 1px solid black;
+    border-collapse: collapse;
+    width: 100%;
+    text-align: center;
+}
+
+div#report td {
+    border: 1px solid black;
+}

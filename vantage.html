@@ -1,7 +1,9 @@
+<!DOCTYPE html>
 <html>
     <head>
         <title>Proddle - Vantage</title>
         <link rel="stylesheet" type="text/css" href="css/proddle.css" />
+        <link rel="stylesheet" type="text/css" href="css/map-report.css" />
     </head>
     <body>
         <?php
@@ -9,7 +11,36 @@
         ?>
         
         <div id="center">
-            TODO - fill out vantage
+            <div id="map"></div>
+            <div id="report"></div>
         </div>
+
+        <script>
+            function initMap() {
+                var map = new google.maps.Map(document.getElementById('map'), {
+                    center: {lat:0, lng: 0},
+                    zoom: 2
+                });
+
+                var table = document.createElement('table');
+
+                //create table header
+                var headerColumns = ['Vantage', 'Measurement', 'Count'];
+
+                var tableHeader = table.insertRow();
+                for (var i=0; i<headerColumns.length; i++) {
+                    tableHeader.insertCell().appendChild(document.createElement('th').appendChild(document.createTextNode(headerColumns[i])));
+                }
+
+                var tr = table.insertRow();
+                tr.insertCell().appendChild(document.createTextNode('test (129.82.138.20)'));
+                tr.insertCell().appendChild(document.createTextNode('http-get'));
+                tr.insertCell().appendChild(document.createTextNode('1387'));
+                document.getElementById('report').appendChild(table);
+            }
+        </script>
+
+        <script src="https://maps.googleapis.com/maps/api/js?key=AIzaSyAeCkjmEFtZ0Wuu6muxH6-4RF6f-pzE3qc&callback=initMap" 
+        async defer></script>
     </body>
 </html>
