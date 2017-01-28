@@ -17,7 +17,9 @@
                 <input type="text" id="domain" value="ex. google.com" />
                 <input type="button" value="GO" onclick="updatePage();" />
             </div>
+            </br>
             <div id="map"></div>
+            </br>
             <div id="report"></div>
             <p>
                 This product includes GeoLite2 data created by MaxMind, available from
@@ -28,6 +30,7 @@
         <script>
             var map;
             var infoWindow;
+            var markers;
 
             function initMap() {
                 infoWindow = new google.maps.InfoWindow;
@@ -35,10 +38,22 @@
                     center: {lat:0, lng: 0},
                     zoom: 2
                 });
+
+                markers = [];
+            }
+
+            function resetPage() {
+                document.getElementById('report').innerHTML = '';
+
+                for (var i=0; i < markers.length; i++) {
+                    markers[i].setMap(null);
+                }
+
+                markers = [];
             }
 
             function updatePage() {
-                document.body.appendChild(document.createTextNode("TEST"));
+                resetPage();
                 var domain = document.getElementById('domain').value;
                 var table = document.createElement('table');
 
@@ -91,6 +106,8 @@
                         '</div>');
                     infoWindow.open(map, marker);
                 });
+
+                markers.push(marker);
             }
         </script>
 
