@@ -1,6 +1,10 @@
 <?php
 require_once 'php/vendor/autoload.php';
 
+//parse command line parameters
+if (isset($_GET['domain'])) $domain=$_GET['domain'];
+else $domain='google.com';
+
 $yesterday = time() - (24 * 60 * 60);
 
 //open driver manager and geoip reader
@@ -11,12 +15,13 @@ $reader = new GeoIp2\Database\Reader('/usr/local/share/GeoLite2/GeoLite2-City.mm
 $cursor = $manager->executeQuery(
     'proddle.results',
     new MongoDB\Driver\Query(
-        ['Timestamp' => ['$gte' => $yesterday]],
+        ['Timestamp' => ['$gte' => $yesterday], 'Domain' => $domain],
         ['sort' => ['Timestamp' => -1]]
     )
 );
 
 //iterate over results
+echo '[';
 $array = $cursor->toArray();
 for ($i=0; $i < count($array); ++$i) {
     $result = $array[$i];
@@ -24,9 +29,17 @@ for ($i=0; $i < count($array); ++$i) {
     //gelocate ip address
     $record = $reader->city($result->IpAddress);
 
-    $result->Latitude = $record->location->latitude;
-    $result->Longitude = $record->location->longitude;
+    echo ($i != 0 ? ',' : '') . '{';
+    echo '"Timestamp":' . $result->Timestamp;
+    echo ',"Hostname":"' . $result->Hostname . '"';
+    echo ',"Domain":"' . $result->Domain . '"';
+    echo ',"IpAddress":"' . $result->IpAddress . '"';
+    echo ',"Latitude":' . $record->location->latitude . '';
+    echo ',"Longitude":' . $record->location->longitude . '';
+    echo ',"Measurement":"' . $result->Measurement . '"';
+
+    echo '}';
 }
 
-echo MongoDB\BSON\toJSON(MongoDB\BSON\fromPHP($array));
+echo ']';
 ?>
