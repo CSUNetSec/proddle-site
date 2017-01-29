@@ -2,12 +2,25 @@ div#docbar {
     position: absolute;
     left: 0px;
     top: 0px;
-    width: 10%;
+    width: 20%;
 }
 
 div#docpane {
     position: absolute;
     right: 0px;
     top: 0px;
-    width: 80%;
+    width: 75%;
+}
+
+ol.navdoc {
+    counter-reset: item;
+}
+
+li.navdoc  {
+    display: block;
+}
+
+li.navdoc:before {
+    content: counters(item, ".") ". ";
+    counter-increment: item;
 }

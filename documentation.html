@@ -13,10 +13,44 @@
         <div id="center">
             <?php
                 include 'php/docbar.php';
-            ?>
+                
+                if (isset($_GET['page'])) $page=$_GET['page'];
+                else $page='introduction';
 
-            <?php
-                include 'php/documentation/introduction.php';
+                switch ($page) {
+                    case 'introduction':
+                        include 'php/documentation/introduction.php';
+                        break;
+                    case 'measurements':
+                        include 'php/documentation/measurements.php';
+                        break;
+                    case 'mongodb':
+                        include 'php/documentation/mongodb.php';
+                        break;
+                    case 'architecture':
+                        include 'php/documentation/architecture.php';
+                        break;
+                    case 'architecture-server':
+                        include 'php/documentation/architecture-server.php';
+                        break;
+                    case 'architecture-vantage':
+                        include 'php/documentation/architecture-vantage.php';
+                        break;
+                    case 'architecture-yogi':
+                        include 'php/documentation/architecture-yogi.php';
+                        break;
+                    case 'technologies':
+                        include 'php/documentation/technologies.php';
+                        break;
+                    case 'technologies-rust':
+                        include 'php/documentation/technologies-rust.php';
+                        break;
+                    case 'technologies-capnproto':
+                        include 'php/documentation/technologies-capnproto.php';
+                        break;
+                    default:
+                        include 'php/documentation/introduction.php';
+                }
             ?>
         </div>
     </body>
