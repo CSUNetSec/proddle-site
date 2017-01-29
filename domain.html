@@ -13,6 +13,14 @@
         ?>
         
         <div id="center">
+            <div id="usage">
+                <h3>Usage</h3>
+                <p>
+                    This page is used to view measurements for a particular domain.
+                    The text area should be populated by the domain name (ex. google.com)
+                    The select menu presents durations over which to view the data.
+                </p>
+            </div>
             <div id="searchbar">
                 Domain: <input type="text" id="domain" value="ex. google.com" />
                 <select id="duration">
@@ -66,7 +74,7 @@
                 var table = document.createElement('table');
 
                 //add table header
-                var headerColumns = ['Timestamp', 'Vantage', 'Measurement', 'Domain Ip', 'Status'];
+                var headerColumns = ['Timestamp', 'Vantage', 'Measurement', 'Domain', 'Domain Ip', 'Status'];
                 var tr = table.insertRow();
                 for (var i=0; i<headerColumns.length; i++) {
                     var th = document.createElement('th');
@@ -87,6 +95,7 @@
                             tr.insertCell().appendChild(document.createTextNode(formatDate(timestamp)));
                             tr.insertCell().appendChild(document.createTextNode(result.Hostname + ' (' + result.IpAddress + ')'));
                             tr.insertCell().appendChild(document.createTextNode(result.Measurement));
+                            tr.insertCell().appendChild(document.createTextNode(result.Domain));
 
                             if (result.Result != null && result.Result.DomainIp != null) {
                                 tr.insertCell().appendChild(document.createTextNode(result.Result.DomainIp));
