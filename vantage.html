@@ -12,6 +12,15 @@
         ?>
         
         <div id="center">
+            <div id="searchbar">
+                <select id="duration">
+                    <option value="1">1 Day</option>
+                    <option value="7">1 Week</option>
+                    <option value="31">1 Month</option>
+                </select>
+                <input type="button" value="GO" onclick="updatePage();" />
+            </div>
+            </br>
             <div id="map"></div>
             </br>
             <div id="report"></div>
@@ -25,6 +34,8 @@
         <script>
             var map;
             var infoWindow;
+            var markers;
+            var markerIpAddresses;
 
             function initMap() {
                 infoWindow = new google.maps.InfoWindow;
@@ -33,10 +44,23 @@
                     zoom: 2
                 });
 
-                updatePage();
+                markers = [];
+            }
+
+            function resetPage() {
+                document.getElementById('report').innerHTML = '';
+
+                for (var i=0; i < markers.length; i++) {
+                    markers[i].setMap(null);
+                }
+
+                markers = [];
+                markerIpAddresses = [];
             }
 
             function updatePage() {
+                resetPage();
+                var duration = document.getElementById('duration');
                 var table = document.createElement('table');
 
                 //add table header
@@ -50,7 +74,7 @@
 
                 //query php/vantage_report.php
                 $.get({
-                    url: 'vantage_report.html',
+                    url: 'vantage_report.html?duration=' + duration.options[duration.selectedIndex].value,
                     dataType: 'json',
                     success: function(data) {
                         for (var i=0; i < data.length; i++) {
@@ -85,21 +109,32 @@
                 document.getElementById('report').appendChild(table);
             }
 
-            function addMarker(hostname, ipAddress, latitude, longitude) {
+            function addMarker(name, ipAddress, latitude, longitude) {
+                //check if ip addresses has already been marked
+                for (var i=0; i<markerIpAddresses.length; i++) {
+                    if (markerIpAddresses[i] == ipAddress) {
+                        return;
+                    }
+                }
+
+                //create marker
                 var marker = new google.maps.Marker({
                     position: {lat: latitude, lng: longitude},
-                    label: hostname.toUpperCase()[0],
+                    label: name.toUpperCase()[0],
                     map: map,
                     clickable: true
                 });
 
                 google.maps.event.addListener(marker, 'click', function() {
                     infoWindow.setContent('<div id=content>' +
-                        '<strong>' + hostname + '</strong>' +
+                        '<strong>' + name + '</strong>' +
                         '<br>' + ipAddress +
                         '</div>');
                     infoWindow.open(map, marker);
                 });
+
+                markers.push(marker);
+                markerIpAddresses.push(ipAddress);
             }
         </script>
 

@@ -1,7 +1,11 @@
 <?php
 require_once 'php/vendor/autoload.php';
 
-$yesterday = time() - (24 * 60 * 60);
+//parse command line parameters
+if (isset($_GET['duration'])) $duration=$_GET['duration'];
+else $duration=1;
+
+$timestamp = time() - ($duration * 24 * 60 * 60);
 
 echo '[';
 
@@ -16,7 +20,7 @@ $cursor = $manager->executeCommand(
         [
             'distinct' => 'results',
             'key' => 'Hostname',
-            'query' => ['Timestamp' => ['$gte' => $yesterday]]
+            'query' => ['Timestamp' => ['$gte' => $timestamp]]
         ]
     )
 );
@@ -37,7 +41,7 @@ for ($i=0; $i < count($array); ++$i) {
             [
                 'distinct' => 'results',
                 'key' => 'IpAddress',
-                'query' => ['Timestamp' => ['$gte' => $yesterday], 'Hostname' => $hostname]
+                'query' => ['Timestamp' => ['$gte' => $timestamp], 'Hostname' => $hostname]
             ]
         )
     );
@@ -64,7 +68,7 @@ for ($i=0; $i < count($array); ++$i) {
             [
                 'distinct' => 'results',
                 'key' => 'Measurement',
-                'query' => ['Timestamp' => ['$gte' => $yesterday], 'Hostname' => $hostname]
+                'query' => ['Timestamp' => ['$gte' => $timestamp], 'Hostname' => $hostname]
             ]
         )
     );
@@ -80,7 +84,7 @@ for ($i=0; $i < count($array); ++$i) {
             new MongoDB\Driver\Command(
                 [
                     'count' => 'results',
-                    'query' => ['Timestamp' => ['$gte' => $yesterday], 'Hostname' => $hostname, 'Measurement' => $measurement]
+                    'query' => ['Timestamp' => ['$gte' => $timestamp], 'Hostname' => $hostname, 'Measurement' => $measurement]
                 ]
             )
         );
