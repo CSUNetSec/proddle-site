@@ -5,7 +5,10 @@ require_once 'php/vendor/autoload.php';
 if (isset($_GET['domain'])) $domain=$_GET['domain'];
 else $domain='google.com';
 
-$yesterday = time() - (24 * 60 * 60);
+if (isset($_GET['duration'])) $duration=$_GET['duration'];
+else $duration=1;
+
+$timestamp = time() - ($duration * 24 * 60 * 60);
 
 //open driver manager and geoip reader
 $manager = new MongoDB\Driver\Manager('mongodb://localhost:27017');
@@ -15,7 +18,7 @@ $reader = new GeoIp2\Database\Reader('/usr/local/share/GeoLite2/GeoLite2-City.mm
 $cursor = $manager->executeQuery(
     'proddle.results',
     new MongoDB\Driver\Query(
-        ['Timestamp' => ['$gte' => $yesterday], 'Domain' => $domain],
+        ['Timestamp' => ['$gte' => $timestamp], 'Domain' => $domain],
         ['sort' => ['Timestamp' => -1]]
     )
 );

@@ -14,7 +14,12 @@
         
         <div id="center">
             <div id="searchbar">
-                <input type="text" id="domain" value="ex. google.com" />
+                Domain: <input type="text" id="domain" value="ex. google.com" />
+                <select id="duration">
+                    <option value="1">1 Day</option>
+                    <option value="7">1 Week</option>
+                    <option value="31">1 Month</option>
+                </select>
                 <input type="button" value="GO" onclick="updatePage();" />
             </div>
             </br>
@@ -57,10 +62,11 @@
             function updatePage() {
                 resetPage();
                 var domain = document.getElementById('domain').value;
+                var duration = document.getElementById('duration');
                 var table = document.createElement('table');
 
                 //add table header
-                var headerColumns = ['Timestamp', 'Vantage', 'Measurement', 'Domain Ip', 'Error'];
+                var headerColumns = ['Timestamp', 'Vantage', 'Measurement', 'Domain Ip', 'Status'];
                 var tr = table.insertRow();
                 for (var i=0; i<headerColumns.length; i++) {
                     var th = document.createElement('th');
@@ -70,7 +76,7 @@
 
                 //query php/domain_report.php
                 $.get({
-                    url: 'domain_report.html?domain=' + domain,
+                    url: 'domain_report.html?domain=' + domain + '&duration=' + duration.options[duration.selectedIndex].value,
                     dataType: 'json',
                     success: function(data) {
                         for (var i=0; i < data.length; i++) {
@@ -81,13 +87,19 @@
                             tr.insertCell().appendChild(document.createTextNode(formatDate(timestamp)));
                             tr.insertCell().appendChild(document.createTextNode(result.Hostname + ' (' + result.IpAddress + ')'));
                             tr.insertCell().appendChild(document.createTextNode(result.Measurement));
+
                             if (result.Result != null && result.Result.DomainIp != null) {
                                 tr.insertCell().appendChild(document.createTextNode(result.Result.DomainIp));
                                 addMarker(result.Domain, result.Result.DomainIp, result.Result.Latitude, result.Result.Longitude);
                             } else {
                                 tr.insertCell().appendChild(document.createTextNode('?'));
                             }
-                            tr.insertCell().appendChild(document.createTextNode(result.Error));
+
+                            if (result.Result != null && result.Result.Error != null) {
+                                tr.insertCell().appendChild(document.createTextNode(result.Result.Error ? 'down' : 'up'));
+                            } else {
+                                tr.insertCell().appendChild(document.createTextNode(result.Error ? 'down' : 'up'));
+                            }
 
                             //add markers to page
                             addMarker(result.Hostname, result.IpAddress, result.Latitude, result.Longitude);
