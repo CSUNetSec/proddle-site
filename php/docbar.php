@@ -12,7 +12,7 @@ echo <<<_END
                 <li class="navdoc"><a href="documentation.html?page=architecture-yogi">Yogi</a></li>
             </ol>
         </li>
-        <li class="navdoc"><a href="documentation.html?page=capnproto">Capnproto</a></li>
+        <li class="navdoc"><a href="documentation.html?page=communication">Communication</a></li>
     </ol>
 </div>
 _END;
