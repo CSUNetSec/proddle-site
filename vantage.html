@@ -91,23 +91,23 @@
 
                             //print hostname and ip addresses
                             var ipAddresses = '';
-                            for (var j=0; j < vantage.IpAddresses.length; j++) {
-                                var ipAddress = vantage.IpAddresses[j];
-                                ipAddresses += (j != 0 ? ', ' : '') + ipAddress.IpAddress;
+                            for (var j=0; j < vantage.ip_addresses.length; j++) {
+                                var ipAddress = vantage.ip_addresses[j];
+                                ipAddresses += (j != 0 ? ', ' : '') + ipAddress.ip_address;
 
-                                addMarker(vantage.Hostname, ipAddress.IpAddress, ipAddress.Latitude, ipAddress.Longitude);
+                                addMarker(vantage.hostname, ipAddress.ip_address, ipAddress.latitude, ipAddress.longitude);
                             }
-                            tr.insertCell().appendChild(document.createTextNode(vantage.Hostname + ' (' + ipAddresses + ')'));
+                            tr.insertCell().appendChild(document.createTextNode(vantage.hostname + ' (' + ipAddresses + ')'));
 
                             //print measurements
-                            for (var j=0; j < vantage.Measurements.length; j++) {
+                            for (var j=0; j < vantage.measurements.length; j++) {
                                 if (j != 0) {
                                     tr = table.insertRow();
                                     tr.insertCell();
                                 }
 
-                                tr.insertCell().appendChild(document.createTextNode(vantage.Measurements[j].Measurement));
-                                tr.insertCell().appendChild(document.createTextNode(vantage.Measurements[j].Count));
+                                tr.insertCell().appendChild(document.createTextNode(vantage.measurements[j].measurement));
+                                tr.insertCell().appendChild(document.createTextNode(vantage.measurements[j].count));
                             }
                         }
                     }

@@ -1,5 +1,6 @@
 <?php
 require_once 'php/vendor/autoload.php';
+require_once 'php/login.php';
 
 //parse command line parameters
 if (isset($_GET['duration'])) $duration=$_GET['duration'];
@@ -10,7 +11,19 @@ $timestamp = time() - ($duration * 24 * 60 * 60);
 echo '[';
 
 //open driver manager and geoip reader
-$manager = new MongoDB\Driver\Manager('mongodb://localhost:27017');
+$manager = new MongoDB\Driver\Manager(
+    $mongodbConnectionString,
+    [
+        'ssl' => TRUE,
+        'username' => $mongodbUsername,
+        'password' => $mongodbPassword,
+        'authSource' => $mongodbAuthSource
+    ],
+    [
+        'ca_file' => $mongodbSslCaCert,
+        'pem_file' => $mongodbSslPem
+    ]
+);
 $reader = new GeoIp2\Database\Reader('/usr/local/share/GeoLite2/GeoLite2-City.mmdb');
 
 //query for distinct hostnames
@@ -19,8 +32,8 @@ $cursor = $manager->executeCommand(
     new MongoDB\Driver\Command(
         [
             'distinct' => 'results',
-            'key' => 'Hostname',
-            'query' => ['Timestamp' => ['$gte' => $timestamp]]
+            'key' => 'hostname',
+            'query' => ['timestamp' => ['$gte' => $timestamp]]
         ]
     )
 );
@@ -30,18 +43,18 @@ $array = $cursor->toArray()[0]->values;
 for ($i=0; $i < count($array); ++$i) {
     $hostname = $array[$i];
 
-    echo ($i != 0 ? ',' : '') . '{"Hostname":"'. $hostname . '"';
+    echo ($i != 0 ? ',' : '') . '{"hostname":"'. $hostname . '"';
 
     //query for distinct ip addresses
-    echo ',"IpAddresses":[';
+    echo ',"ip_addresses":[';
 
     $ipCursor = $manager->executeCommand(
         'proddle',
         new MongoDB\Driver\Command(
             [
                 'distinct' => 'results',
-                'key' => 'IpAddress',
-                'query' => ['Timestamp' => ['$gte' => $timestamp], 'Hostname' => $hostname]
+                'key' => 'ip_address',
+                'query' => ['timestamp' => ['$gte' => $timestamp], 'hostname' => $hostname]
             ]
         )
     );
@@ -54,21 +67,21 @@ for ($i=0; $i < count($array); ++$i) {
         //geolocation ip address
         $record = $reader->city($ipAddress);
 
-        echo ($j != 0 ? ',' : '') . '{"IpAddress":"'. $ipAddress . '","Latitude":' . $record->location->latitude . ',"Longitude":' . $record->location->longitude . '}';
+        echo ($j != 0 ? ',' : '') . '{"ip_address":"'. $ipAddress . '","latitude":' . $record->location->latitude . ',"longitude":' . $record->location->longitude . '}';
     }
 
     echo ']';
 
     //query for distinct measurements
-    echo ',"Measurements":[';
+    echo ',"measurements":[';
 
     $measurementCursor = $manager->executeCommand(
         'proddle',
         new MongoDB\Driver\Command(
             [
                 'distinct' => 'results',
-                'key' => 'Measurement',
-                'query' => ['Timestamp' => ['$gte' => $timestamp], 'Hostname' => $hostname]
+                'key' => 'measurement',
+                'query' => ['timestamp' => ['$gte' => $timestamp], 'hostname' => $hostname]
             ]
         )
     );
@@ -84,14 +97,14 @@ for ($i=0; $i < count($array); ++$i) {
             new MongoDB\Driver\Command(
                 [
                     'count' => 'results',
-                    'query' => ['Timestamp' => ['$gte' => $timestamp], 'Hostname' => $hostname, 'Measurement' => $measurement]
+                    'query' => ['timestamp' => ['$gte' => $timestamp], 'hostname' => $hostname, 'measurement' => $measurement]
                 ]
             )
         );
 
         $countArray = $countCursor->toArray();
 
-        echo ($j != 0 ? ',' : '') . '{"Measurement":"'. $measurement . '","Count":' . $countArray[0]->n . '}';
+        echo ($j != 0 ? ',' : '') . '{"measurement":"'. $measurement . '","count":' . $countArray[0]->n . '}';
     }
 
     echo ']}';

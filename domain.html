@@ -91,27 +91,27 @@
                             var result = data[i];
                             
                             var tr = table.insertRow();
-                            var timestamp = new Date(result.Timestamp * 1000);
+                            var timestamp = new Date(result.timestamp * 1000);
                             tr.insertCell().appendChild(document.createTextNode(formatDate(timestamp)));
-                            tr.insertCell().appendChild(document.createTextNode(result.Hostname + ' (' + result.IpAddress + ')'));
-                            tr.insertCell().appendChild(document.createTextNode(result.Measurement));
-                            tr.insertCell().appendChild(document.createTextNode(result.Domain));
+                            tr.insertCell().appendChild(document.createTextNode(result.hostname + ' (' + result.ip_address + ')'));
+                            tr.insertCell().appendChild(document.createTextNode(result.measurement));
+                            tr.insertCell().appendChild(document.createTextNode(result.domain));
 
-                            if (result.Result != null && result.Result.DomainIp != null) {
-                                tr.insertCell().appendChild(document.createTextNode(result.Result.DomainIp));
-                                addMarker(result.Domain, result.Result.DomainIp, result.Result.Latitude, result.Result.Longitude);
+                            if (result.result != null && result.result.domain_ip != null) {
+                                tr.insertCell().appendChild(document.createTextNode(result.result.domain_ip));
+                                addMarker(result.domain, result.result.domain_ip, result.result.latitude, result.result.longitude);
                             } else {
                                 tr.insertCell().appendChild(document.createTextNode('?'));
                             }
 
-                            if (result.Result != null && result.Result.Error != null) {
-                                tr.insertCell().appendChild(document.createTextNode(result.Result.Error ? 'down' : 'up'));
+                            if (result.result != null && result.result.error != null) {
+                                tr.insertCell().appendChild(document.createTextNode(result.result.error ? 'down' : 'up'));
                             } else {
-                                tr.insertCell().appendChild(document.createTextNode(result.Error ? 'down' : 'up'));
+                                tr.insertCell().appendChild(document.createTextNode(result.error ? 'down' : 'up'));
                             }
 
                             //add markers to page
-                            addMarker(result.Hostname, result.IpAddress, result.Latitude, result.Longitude);
+                            addMarker(result.hostname, result.ip_address, result.latitude, result.longitude);
                         }
                     }
                 });
