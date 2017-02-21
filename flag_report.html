@@ -1,0 +1,114 @@
+<?php
+require_once 'php/vendor/autoload.php';
+require_once 'php/login.php';
+
+//parse command line parameters
+if (isset($_GET['duration'])) $duration=$_GET['duration'];
+else $duration=1;
+
+$timestamp = time() - ($duration * 24 * 60 * 60);
+
+echo '[';
+
+//open driver manager and geoip reader
+$manager = new MongoDB\Driver\Manager(
+    $mongodbConnectionString,
+    [
+        'ssl' => TRUE,
+        'username' => $mongodbUsername,
+        'password' => $mongodbPassword,
+        'authSource' => $mongodbAuthSource
+    ],
+    [
+        'ca_file' => $mongodbSslCaCert,
+        'pem_file' => $mongodbSslPem
+    ]
+);
+$reader = new GeoIp2\Database\Reader('/usr/local/share/GeoLite2/GeoLite2-City.mmdb');
+
+//query for distinct hostnames
+$cursor = $manager->executeCommand(
+    'proddle',
+    new MongoDB\Driver\Command(
+        [
+            'distinct' => 'results',
+            'key' => 'hostname',
+            'query' => ['timestamp' => ['$gte' => $timestamp]]
+        ]
+    )
+);
+
+//iterate over distinct hostnames
+$array = $cursor->toArray()[0]->values;
+for ($i=0; $i < count($array); ++$i) {
+    $hostname = $array[$i];
+
+    echo ($i != 0 ? ',' : '') . '{"hostname":"'. $hostname . '"';
+
+    //query for distinct ip addresses
+    echo ',"ip_addresses":[';
+
+    $ipCursor = $manager->executeCommand(
+        'proddle',
+        new MongoDB\Driver\Command(
+            [
+                'distinct' => 'results',
+                'key' => 'ip_address',
+                'query' => ['timestamp' => ['$gte' => $timestamp], 'hostname' => $hostname]
+            ]
+        )
+    );
+
+    //iterate over ip addresses
+    $ipArray = $ipCursor->toArray()[0]->values;
+    for ($j=0; $j < count($ipArray); ++$j) {
+        $ipAddress = $ipArray[$j];
+
+        //geolocation ip address
+        $record = $reader->city($ipAddress);
+
+        echo ($j != 0 ? ',' : '') . '{"ip_address":"'. $ipAddress . '","latitude":' . $record->location->latitude . ',"longitude":' . $record->location->longitude . '}';
+    }
+
+    echo ']';
+
+    //query for distinct measurements
+    echo ',"measurements":[';
+
+    $measurementCursor = $manager->executeCommand(
+        'proddle',
+        new MongoDB\Driver\Command(
+            [
+                'distinct' => 'results',
+                'key' => 'measurement',
+                'query' => ['timestamp' => ['$gte' => $timestamp], 'hostname' => $hostname]
+            ]
+        )
+    );
+
+    //iterate over measurements
+    $measurementArray = $measurementCursor->toArray()[0]->values;
+    for ($j=0; $j < count($measurementArray); ++$j) {
+        $measurement = $measurementArray[$j];
+
+        //query for measurement count
+        $countCursor = $manager->executeCommand(
+            'proddle',
+            new MongoDB\Driver\Command(
+                [
+                    'count' => 'results',
+                    'query' => ['timestamp' => ['$gte' => $timestamp], 'hostname' => $hostname, 'measurement' => $measurement]
+                ]
+            )
+        );
+
+        $countArray = $countCursor->toArray();
+
+        echo ($j != 0 ? ',' : '') . '{"measurement":"'. $measurement . '","count":' . $countArray[0]->n . '}';
+    }
+
+    echo ']}';
+}
+
+echo ']';
+?>

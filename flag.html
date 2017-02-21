@@ -1,0 +1,171 @@
+<!DOCTYPE html>
+<html>
+    <head>
+        <title>Proddle - Vantage</title>
+        <link rel="stylesheet" type="text/css" href="css/proddle.css" />
+        <link rel="stylesheet" type="text/css" href="css/map-report.css" />
+        <script src="https://ajax.googleapis.com/ajax/libs/jquery/3.1.1/jquery.min.js"></script>
+    </head>
+    <body>
+        <?php
+            include 'php/header.php';
+        ?>
+        
+        <div id="center">
+            <div id="usage">
+                <h3>Usage</h3>
+                <p>
+                    This page is used to view the current vantage points. The select menu presents durations over which to view the data.
+                </p>
+            </div>
+            <div id="searchbar">
+                Domain: <input type="text" id="domain" value="" />
+                <select id="duration">
+                    <option value="1">1 Day</option>
+                    <option value="7">1 Week</option>
+                    <option value="31">1 Month</option>
+                </select>
+                <input type="button" value="GO" onclick="updatePage();" />
+            </div>
+            </br>
+            <div id="topflags" class="report"></div>
+            <div id="flagstatuses" class="report"></div>
+            <div id="flaganalyzers" class="report"></div>
+            </br>
+            <div id="map"></div>
+            </br>
+            <div id="mapreport" class="report"></div>
+            </br>
+            <p>
+                This product includes GeoLite2 data created by MaxMind, available from
+                <a href="http://www.maxmind.com">http://www.maxmind.com</a>.
+            </p>
+        </div>
+
+        <script>
+            var map;
+            var infoWindow;
+            var markers;
+            var markerIpAddresses;
+
+            function initMap() {
+                infoWindow = new google.maps.InfoWindow;
+                map = new google.maps.Map(document.getElementById('map'), {
+                    center: {lat:0, lng: 0},
+                    zoom: 2
+                });
+
+                markers = [];
+                updatePage();
+            }
+
+            function resetPage() {
+                document.getElementById('topflags').innerHTML = '';
+                document.getElementById('flagstatuses').innerHTML = '';
+                document.getElementById('flaganalyzers').innerHTML = '';
+                document.getElementById('mapreport').innerHTML = '';
+
+                for (var i=0; i < markers.length; i++) {
+                    markers[i].setMap(null);
+                }
+
+                markers = [];
+                markerIpAddresses = [];
+            }
+
+            function updatePage() {
+                resetPage();
+                var duration = document.getElementById('duration');
+                var topFlagsTable = document.createElement('table');
+                var flagStatusesTable = document.createElement('table');
+                var flagAnalyzersTable = document.createElement('table');
+                var mapTable = document.createElement('table');
+
+                //add table header
+                addHeaderColumns(topFlagsTable, ['Domain', 'Url', 'Count']);
+                addHeaderColumns(flagStatusesTable, ['Status', 'Count']);
+                addHeaderColumns(flagAnalyzersTable, ['Analyzer', 'Count']);
+                addHeaderColumns(mapTable, ['Timestamp', 'Vantage', 'Domain', 'Url', 'Status', 'Analyzer']);
+
+                //query php/vantage_report.php
+                $.get({
+                    url: 'flag_report.html?duration=' + duration.options[duration.selectedIndex].value,
+                    dataType: 'json',
+                    success: function(data) {
+                        for (var i=0; i < data.length; i++) {
+                            var vantage = data[i];
+
+                            var tr = mapTable.insertRow();
+
+                            //print hostname and ip addresses
+                            var ipAddresses = '';
+                            for (var j=0; j < vantage.ip_addresses.length; j++) {
+                                var ipAddress = vantage.ip_addresses[j];
+                                ipAddresses += (j != 0 ? ', ' : '') + ipAddress.ip_address;
+
+                                addMarker(vantage.hostname, ipAddress.ip_address, ipAddress.latitude, ipAddress.longitude);
+                            }
+                            tr.insertCell().appendChild(document.createTextNode(vantage.hostname + ' (' + ipAddresses + ')'));
+
+                            //print measurements
+                            for (var j=0; j < vantage.measurements.length; j++) {
+                                if (j != 0) {
+                                    tr = table.insertRow();
+                                    tr.insertCell();
+                                }
+
+                                tr.insertCell().appendChild(document.createTextNode(vantage.measurements[j].measurement));
+                                tr.insertCell().appendChild(document.createTextNode(vantage.measurements[j].count));
+                            }
+                        }
+                    }
+                });
+
+                document.getElementById('topflags').appendChild(topFlagsTable);
+                document.getElementById('flagstatuses').appendChild(flagStatusesTable);
+                document.getElementById('flaganalyzers').appendChild(flagAnalyzersTable);
+                document.getElementById('mapreport').appendChild(mapTable);
+            }
+
+            function addHeaderColumns(table, headerColumns) {
+                var tr = table.insertRow();
+                for (var i=0; i<headerColumns.length; i++) {
+                    var th = document.createElement('th');
+                    th.appendChild(document.createTextNode(headerColumns[i]));
+                    tr.appendChild(th);
+                }
+            }
+
+            function addMarker(name, ipAddress, latitude, longitude) {
+                //check if ip addresses has already been marked
+                for (var i=0; i<markerIpAddresses.length; i++) {
+                    if (markerIpAddresses[i] == ipAddress) {
+                        return;
+                    }
+                }
+
+                //create marker
+                var marker = new google.maps.Marker({
+                    position: {lat: latitude, lng: longitude},
+                    label: name.toUpperCase()[0],
+                    map: map,
+                    clickable: true
+                });
+
+                google.maps.event.addListener(marker, 'click', function() {
+                    infoWindow.setContent('<div id=content>' +
+                        '<strong>' + name + '</strong>' +
+                        '<br>' + ipAddress +
+                        '</div>');
+                    infoWindow.open(map, marker);
+                });
+
+                markers.push(marker);
+                markerIpAddresses.push(ipAddress);
+            }
+        </script>
+
+        <script src="https://maps.googleapis.com/maps/api/js?key=AIzaSyAeCkjmEFtZ0Wuu6muxH6-4RF6f-pzE3qc&callback=initMap" 
+        async defer></script>
+    </body>
+</html>
