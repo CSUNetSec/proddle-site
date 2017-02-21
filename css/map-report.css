@@ -10,18 +10,18 @@ div#map {
     height: 600px;
 }
 
-div#report table {
+div.report table {
     border: 1px solid black;
     border-collapse: collapse;
     width: 100%;
     text-align: center;
 }
 
-div#report th {
+div.report th {
     border: 1px solid black;
     background-color: lightgrey;
 }
 
-div#report td {
+div.report td {
     border: 1px solid black;
 }

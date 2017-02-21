@@ -29,7 +29,7 @@
             </br>
             <div id="map"></div>
             </br>
-            <div id="report"></div>
+            <div id="mapreport" class="report"></div>
             </br>
             <p>
                 This product includes GeoLite2 data created by MaxMind, available from
@@ -55,7 +55,7 @@
             }
 
             function resetPage() {
-                document.getElementById('report').innerHTML = '';
+                document.getElementById('mapreport').innerHTML = '';
 
                 for (var i=0; i < markers.length; i++) {
                     markers[i].setMap(null);
@@ -113,7 +113,7 @@
                     }
                 });
 
-                document.getElementById('report').appendChild(table);
+                document.getElementById('mapreport').appendChild(table);
             }
 
             function addMarker(name, ipAddress, latitude, longitude) {
