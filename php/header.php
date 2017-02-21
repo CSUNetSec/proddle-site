@@ -9,7 +9,7 @@ echo <<<_END
         <ul>
             <li><a href="index.html">Home</a></li>
             <li><a href="vantage.html">Vantage</a></li>
-            <li><a href="domain.html">Domain</a></li>
+            <li><a href="measurement.html">Measurement</a></li>
             <li><a href="documentation.html">Documentation</a></li>
         </ul>
     </div>

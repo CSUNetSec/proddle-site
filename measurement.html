@@ -82,9 +82,9 @@
                     tr.appendChild(th);
                 }
 
-                //query php/domain_report.php
+                //query php/measurement_report.php
                 $.get({
-                    url: 'domain_report.html?domain=' + domain + '&duration=' + duration.options[duration.selectedIndex].value,
+                    url: 'measurement_report.html?domain=' + domain + '&duration=' + duration.options[duration.selectedIndex].value,
                     dataType: 'json',
                     success: function(data) {
                         for (var i=0; i < data.length; i++) {
