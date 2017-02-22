@@ -4,6 +4,11 @@
         <title>Proddle - Domain</title>
         <link rel="stylesheet" type="text/css" href="css/proddle.css" />
         <link rel="stylesheet" type="text/css" href="css/map-report.css" />
+        <style>
+            .resultlink {
+                text-decoration: underline;
+            }
+        </style>
         <script src="js/proddle.js"></script>
         <script src="https://ajax.googleapis.com/ajax/libs/jquery/3.1.1/jquery.min.js"></script>
     </head>
@@ -108,6 +113,7 @@
 
             function createLink(result) {
                 var link = document.createElement('a');
+                link.className = 'resultlink';
                 link.appendChild(document.createTextNode(result.measurement));
                 link.onclick = function() {
                     if (result.result != null) {
