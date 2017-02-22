@@ -74,13 +74,7 @@
                 var table = document.createElement('table');
 
                 //add table header
-                var headerColumns = ['Timestamp', 'Vantage', 'Measurement', 'Domain', 'Domain Ip', 'Status'];
-                var tr = table.insertRow();
-                for (var i=0; i<headerColumns.length; i++) {
-                    var th = document.createElement('th');
-                    th.appendChild(document.createTextNode(headerColumns[i]));
-                    tr.appendChild(th);
-                }
+                addHeaderColumns(table, ['Timestamp', 'Vantage', 'Measurement', 'Domain', 'Domain Ip', 'Status']);
 
                 //query php/measurement_report.php
                 $.get({

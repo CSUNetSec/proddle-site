@@ -4,6 +4,7 @@
         <title>Proddle - Vantage</title>
         <link rel="stylesheet" type="text/css" href="css/proddle.css" />
         <link rel="stylesheet" type="text/css" href="css/map-report.css" />
+        <script src="js/proddle.js"></script>
         <script src="https://ajax.googleapis.com/ajax/libs/jquery/3.1.1/jquery.min.js"></script>
     </head>
     <body>
@@ -71,44 +72,22 @@
                 var table = document.createElement('table');
 
                 //add table header
-                var headerColumns = ['Vantage', 'Measurement', 'Count'];
-                var tr = table.insertRow();
-                for (var i=0; i<headerColumns.length; i++) {
-                    var th = document.createElement('th');
-                    th.appendChild(document.createTextNode(headerColumns[i]));
-                    tr.appendChild(th);
-                }
+                addHeaderColumns(table, ['Hostname', 'Ip Address', 'Measurement', 'Count']);
 
                 //query php/vantage_report.php
                 $.get({
                     url: 'vantage_report.html?duration=' + duration.options[duration.selectedIndex].value,
                     dataType: 'json',
                     success: function(data) {
-                        for (var i=0; i < data.length; i++) {
-                            var vantage = data[i];
-
+                        for (var i=0; i<data.vantages.length; i++) {
+                            var vantage = data.vantages[i];
                             var tr = table.insertRow();
+                            tr.insertCell().appendChild(document.createTextNode(vantage.hostname));
+                            tr.insertCell().appendChild(document.createTextNode(vantage.ip_address));
+                            tr.insertCell().appendChild(document.createTextNode(vantage.measurement));
+                            tr.insertCell().appendChild(document.createTextNode(vantage.count));
 
-                            //print hostname and ip addresses
-                            var ipAddresses = '';
-                            for (var j=0; j < vantage.ip_addresses.length; j++) {
-                                var ipAddress = vantage.ip_addresses[j];
-                                ipAddresses += (j != 0 ? ', ' : '') + ipAddress.ip_address;
-
-                                addMarker(vantage.hostname, ipAddress.ip_address, ipAddress.latitude, ipAddress.longitude);
-                            }
-                            tr.insertCell().appendChild(document.createTextNode(vantage.hostname + ' (' + ipAddresses + ')'));
-
-                            //print measurements
-                            for (var j=0; j < vantage.measurements.length; j++) {
-                                if (j != 0) {
-                                    tr = table.insertRow();
-                                    tr.insertCell();
-                                }
-
-                                tr.insertCell().appendChild(document.createTextNode(vantage.measurements[j].measurement));
-                                tr.insertCell().appendChild(document.createTextNode(vantage.measurements[j].count));
-                            }
+                            addMarker(vantage.hostname, vantage.ip_address, vantage.latitude, vantage.longitude);
                         }
                     }
                 });
