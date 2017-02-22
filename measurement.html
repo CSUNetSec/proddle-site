@@ -74,7 +74,7 @@
                 var table = document.createElement('table');
 
                 //add table header
-                addHeaderColumns(table, ['Timestamp', 'Vantage', 'Measurement', 'Domain', 'Domain Ip', 'Status']);
+                addHeaderColumns(table, ['Timestamp', 'Vantage', 'Measurement', 'Domain', 'Status']);
 
                 //query php/measurement_report.php
                 $.get({
@@ -88,15 +88,8 @@
                             var timestamp = new Date(result.timestamp * 1000);
                             tr.insertCell().appendChild(document.createTextNode(formatDate(timestamp)));
                             tr.insertCell().appendChild(document.createTextNode(result.hostname + ' (' + result.ip_address + ')'));
-                            tr.insertCell().appendChild(document.createTextNode(result.measurement));
+                            tr.insertCell().appendChild(createLink(result));
                             tr.insertCell().appendChild(document.createTextNode(result.domain));
-
-                            if (result.result != null && result.result.domain_ip != null) {
-                                tr.insertCell().appendChild(document.createTextNode(result.result.domain_ip));
-                                addMarker(result.domain, result.result.domain_ip, result.result.latitude, result.result.longitude);
-                            } else {
-                                tr.insertCell().appendChild(document.createTextNode('?'));
-                            }
 
                             if (result.result != null && result.result.error != null) {
                                 tr.insertCell().appendChild(document.createTextNode(result.result.error ? 'down' : 'up'));
@@ -111,6 +104,20 @@
                 });
 
                 document.getElementById('mapreport').appendChild(table);
+            }
+
+            function createLink(result) {
+                var link = document.createElement('a');
+                link.appendChild(document.createTextNode(result.measurement));
+                link.onclick = function() {
+                    if (result.result != null) {
+                        alert(JSON.stringify(result.result, null, 4));
+                    } else {
+                        alert('No result to display');
+                    }
+                };
+
+                return link;
             }
 
             function addMarker(name, ipAddress, latitude, longitude) {

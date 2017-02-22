@@ -7,6 +7,10 @@ function addHeaderColumns(table, headerColumns) {
     }
 }
 
+function raiseAlert(node, content) {
+    alert(content);
+}
+
 function formatDate(date) {
     return date.getUTCFullYear() + 
         '.' + (date.getUTCMonth() < 9 ? '0' + (date.getUTCMonth() + 1) : (date.getUTCMonth() + 1)) +
