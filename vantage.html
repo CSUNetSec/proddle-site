@@ -72,6 +72,7 @@
                 var table = document.createElement('table');
 
                 //add table header
+                table.createCaption().innerHTML = '<b>Measurement Count By Active Vantages</b>';
                 addHeaderColumns(table, ['Hostname', 'Ip Address', 'Measurement', 'Count']);
 
                 //query php/vantage_report.php

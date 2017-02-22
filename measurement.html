@@ -79,6 +79,7 @@
                 var table = document.createElement('table');
 
                 //add table header
+                table.createCaption().innerHTML = '<b>Measurements By Domain</b>';
                 addHeaderColumns(table, ['Timestamp', 'Vantage', 'Measurement', 'Domain', 'Status']);
 
                 //query php/measurement_report.php

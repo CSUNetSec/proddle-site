@@ -6,17 +6,18 @@
         <link rel="stylesheet" type="text/css" href="css/map-report.css" />
         <style>
             div#reportbar {
-                height: 20%;
+                overflow: auto;
+                text-align: center;
             }
 
             div#reportbar ul {
                 list-style-type: none;
-                display: inline;
+                display: inline-block;
             }
 
             div#reportbar ul li {
                 float: left;
-                padding-left: 10px;
+                padding: 10px;
             }
         </style>
         <script src="js/proddle.js"></script>
@@ -51,7 +52,6 @@
                     <li><div id="flaganalyzers" class="report"></div></li>
                 </ul>
             </div>
-            </br>
             <div id="map"></div>
             </br>
             <div id="mapreport" class="report"></div>
@@ -102,9 +102,13 @@
                 var mapTable = document.createElement('table');
 
                 //add table header
+                topFlagsTable.createCaption().innerHTML = '<b>Top 10 Flagged Domains</b>';
                 addHeaderColumns(topFlagsTable, ['Domain', 'Url', 'Count']);
+                flagStatusesTable.createCaption().innerHTML = '<b>Flag Count By Status</b>';
                 addHeaderColumns(flagStatusesTable, ['Status', 'Count']);
+                flagAnalyzersTable.createCaption().innerHTML = '<b>Flag Count By Analyzer</b>';
                 addHeaderColumns(flagAnalyzersTable, ['Analyzer', 'Count']);
+                mapTable.createCaption().innerHTML = '<b>100 Most Recent Flags</b>'
                 addHeaderColumns(mapTable, ['Timestamp', 'Vantage', 'Domain', 'Url', 'Status', 'Analyzer']);
 
                 //query php/vantage_report.php
