@@ -15,11 +15,11 @@
             <div id="usage">
                 <h3>Usage</h3>
                 <p>
-                    This page is used to view the current vantage points. The select menu presents durations over which to view the data.
+                    This page is used to view flags for each domain/url. The
+                    select menu presents durations over which to view the data.
                 </p>
             </div>
             <div id="searchbar">
-                Domain: <input type="text" id="domain" value="" />
                 <select id="duration">
                     <option value="1">1 Day</option>
                     <option value="7">1 Week</option>
@@ -29,7 +29,9 @@
             </div>
             </br>
             <div id="topflags" class="report"></div>
+            </br>
             <div id="flagstatuses" class="report"></div>
+            </br>
             <div id="flaganalyzers" class="report"></div>
             </br>
             <div id="map"></div>
@@ -92,31 +94,26 @@
                     url: 'flag_report.html?duration=' + duration.options[duration.selectedIndex].value,
                     dataType: 'json',
                     success: function(data) {
-                        for (var i=0; i < data.length; i++) {
-                            var vantage = data[i];
+                        for (var i=0; i<data.top_flags.length; i++) {
+                            var topFlag = data.top_flags[i];
+                            var tr = topFlagsTable.insertRow();
+                            tr.insertCell().appendChild(document.createTextNode(topFlag.domain));
+                            tr.insertCell().appendChild(document.createTextNode(topFlag.url));
+                            tr.insertCell().appendChild(document.createTextNode(topFlag.count));
+                        }
 
-                            var tr = mapTable.insertRow();
+                        for (var i=0; i<data.flag_statuses.length; i++) {
+                            var flagStatus = data.flag_statuses[i];
+                            var tr = flagStatusesTable.insertRow();
+                            tr.insertCell().appendChild(document.createTextNode(flagStatus.status));
+                            tr.insertCell().appendChild(document.createTextNode(flagStatus.count));
+                        }
 
-                            //print hostname and ip addresses
-                            var ipAddresses = '';
-                            for (var j=0; j < vantage.ip_addresses.length; j++) {
-                                var ipAddress = vantage.ip_addresses[j];
-                                ipAddresses += (j != 0 ? ', ' : '') + ipAddress.ip_address;
-
-                                addMarker(vantage.hostname, ipAddress.ip_address, ipAddress.latitude, ipAddress.longitude);
-                            }
-                            tr.insertCell().appendChild(document.createTextNode(vantage.hostname + ' (' + ipAddresses + ')'));
-
-                            //print measurements
-                            for (var j=0; j < vantage.measurements.length; j++) {
-                                if (j != 0) {
-                                    tr = table.insertRow();
-                                    tr.insertCell();
-                                }
-
-                                tr.insertCell().appendChild(document.createTextNode(vantage.measurements[j].measurement));
-                                tr.insertCell().appendChild(document.createTextNode(vantage.measurements[j].count));
-                            }
+                        for (var i=0; i<data.flag_analyzers.length; i++) {
+                            var flagAnalyzer = data.flag_analyzers[i];
+                            var tr = flagAnalyzersTable.insertRow();
+                            tr.insertCell().appendChild(document.createTextNode(flagAnalyzer.analyzer));
+                            tr.insertCell().appendChild(document.createTextNode(flagAnalyzer.count));
                         }
                     }
                 });
