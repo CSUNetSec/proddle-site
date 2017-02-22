@@ -8,6 +8,9 @@ else $duration=1;
 
 $timestamp = time() - ($duration * 24 * 60 * 60);
 
+if (isset($_GET['domain'])) $match_clause=['domain' => $_GET['domain'], 'timestamp' => ['$gte' => $timestamp]];
+else $match_clause=['timestamp' => ['$gte' => $timestamp]];
+
 //open driver manager and geoip reader
 $manager = new MongoDB\Driver\Manager(
     $mongodbConnectionString,
@@ -33,7 +36,7 @@ $top_cursor = $manager->executeCommand(
             'aggregate' => 'flags',
             'pipeline' => [
                 [
-                    '$match' => ['timestamp' => ['$gte' => $timestamp]]
+                    '$match' => $match_clause
                 ],
                 [
                     '$group' => [
@@ -67,7 +70,7 @@ $status_cursor = $manager->executeCommand(
             'aggregate' => 'flags',
             'pipeline' => [
                 [
-                    '$match' => ['timestamp' => ['$gte' => $timestamp]]
+                    '$match' => $match_clause
                 ],
                 [
                     '$group' => [
@@ -98,7 +101,7 @@ $analyzer_cursor = $manager->executeCommand(
             'aggregate' => 'flags',
             'pipeline' => [
                 [
-                    '$match' => ['timestamp' => ['$gte' => $timestamp]]
+                    '$match' => $match_clause
                 ],
                 [
                     '$group' => [
@@ -122,6 +125,37 @@ for ($i=0; $i < count($analyzer_array); ++$i) {
 
 //TODO query for flags
 echo '],"flags":[';
+$flag_cursor = $manager->executeCommand(
+    'tipup',
+    new MongoDB\Driver\Command(
+        [
+            'aggregate' => 'flags',
+            'pipeline' => [
+                [
+                    '$match' => $match_clause
+                ],
+                [
+                    '$sort' => ['count' => -1]
+                ],
+                [
+                    '$limit' => 25
+                ]
+            ]
+        ]
+    )
+);
+
+$flag_array = $flag_cursor->toArray()[0]->result;
+for ($i=0; $i < count($flag_array); ++$i) {
+    $flag = $flag_array[$i];
+
+    $record = $reader->city($flag->ip_address);
+
+    $flag->latitude = $record->location->latitude;
+    $flag->longitude = $record->location->longitude;
+
+    echo ($i != 0 ? ',' : '') . MongoDB\BSON\toJSON(MongoDB\BSON\fromPHP($flag));
+}
 
 echo ']}';
 ?>

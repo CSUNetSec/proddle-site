@@ -37,6 +37,7 @@
                 </p>
             </div>
             <div id="searchbar">
+                Domain: <input type="text" id="domain" value="" />
                 <select id="duration">
                     <option value="1">1 Day</option>
                     <option value="7">1 Week</option>
@@ -95,6 +96,7 @@
 
             function updatePage() {
                 resetPage();
+                var domain = document.getElementById('domain').value;
                 var duration = document.getElementById('duration');
                 var topFlagsTable = document.createElement('table');
                 var flagStatusesTable = document.createElement('table');
@@ -102,18 +104,18 @@
                 var mapTable = document.createElement('table');
 
                 //add table header
-                topFlagsTable.createCaption().innerHTML = '<b>Top 10 Flagged Domains</b>';
+                topFlagsTable.createCaption().innerHTML = '<b>Top 10 Flagged Urls</b>';
                 addHeaderColumns(topFlagsTable, ['Domain', 'Url', 'Count']);
                 flagStatusesTable.createCaption().innerHTML = '<b>Flag Count By Status</b>';
                 addHeaderColumns(flagStatusesTable, ['Status', 'Count']);
                 flagAnalyzersTable.createCaption().innerHTML = '<b>Flag Count By Analyzer</b>';
                 addHeaderColumns(flagAnalyzersTable, ['Analyzer', 'Count']);
-                mapTable.createCaption().innerHTML = '<b>100 Most Recent Flags</b>'
+                mapTable.createCaption().innerHTML = '<b>25 Most Recent Flags</b>'
                 addHeaderColumns(mapTable, ['Timestamp', 'Vantage', 'Domain', 'Url', 'Status', 'Analyzer']);
 
                 //query php/vantage_report.php
                 $.get({
-                    url: 'flag_report.html?duration=' + duration.options[duration.selectedIndex].value,
+                    url: 'flag_report.html?duration=' + duration.options[duration.selectedIndex].value + (domain != '' ? '&domain=' + domain : ''),
                     dataType: 'json',
                     success: function(data) {
                         for (var i=0; i<data.top_flags.length; i++) {
@@ -136,6 +138,20 @@
                             var tr = flagAnalyzersTable.insertRow();
                             tr.insertCell().appendChild(document.createTextNode(flagAnalyzer.analyzer));
                             tr.insertCell().appendChild(document.createTextNode(flagAnalyzer.count));
+                        }
+
+                        for (var i=0; i<data.flags.length; i++) {
+                            var flag = data.flags[i];
+                            var tr = mapTable.insertRow();
+                            var timestamp = new Date(flag.timestamp * 1000);
+                            tr.insertCell().appendChild(document.createTextNode(formatDate(timestamp)));
+                            tr.insertCell().appendChild(document.createTextNode(flag.hostname + ' (' + flag.ip_address + ')'));
+                            tr.insertCell().appendChild(document.createTextNode(flag.domain));
+                            tr.insertCell().appendChild(document.createTextNode(flag.url));
+                            tr.insertCell().appendChild(document.createTextNode(flag.status));
+                            tr.insertCell().appendChild(document.createTextNode(flag.analyzer));
+
+                            addMarker(flag.hostname, flag.ip_address, flag.latitude, flag.longitude);
                         }
                     }
                 });
