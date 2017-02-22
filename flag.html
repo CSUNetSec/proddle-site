@@ -4,6 +4,21 @@
         <title>Proddle - Vantage</title>
         <link rel="stylesheet" type="text/css" href="css/proddle.css" />
         <link rel="stylesheet" type="text/css" href="css/map-report.css" />
+        <style>
+            div#reportbar {
+                height: 20%;
+            }
+
+            div#reportbar ul {
+                list-style-type: none;
+                display: inline;
+            }
+
+            div#reportbar ul li {
+                float: left;
+                padding-left: 10px;
+            }
+        </style>
         <script src="js/proddle.js"></script>
         <script src="https://ajax.googleapis.com/ajax/libs/jquery/3.1.1/jquery.min.js"></script>
     </head>
@@ -29,11 +44,13 @@
                 <input type="button" value="GO" onclick="updatePage();" />
             </div>
             </br>
-            <div id="topflags" class="report"></div>
-            </br>
-            <div id="flagstatuses" class="report"></div>
-            </br>
-            <div id="flaganalyzers" class="report"></div>
+            <div id="reportbar">
+                <ul>
+                    <li><div id="topflags" class="report"></div></li>
+                    <li><div id="flagstatuses" class="report"></div></li>
+                    <li><div id="flaganalyzers" class="report"></div></li>
+                </ul>
+            </div>
             </br>
             <div id="map"></div>
             </br>
