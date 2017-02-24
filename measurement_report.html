@@ -49,9 +49,11 @@ for ($i=0; $i < count($array); ++$i) {
 
     if (isset($result->result)) {
         if (isset($result->result->domain_ip)) {
-            $domainRecord = $reader->city($result->result->domain_ip);
-            $result->result->latitude = $domainRecord->location->latitude;
-            $result->result->longitude = $domainRecord->location->longitude;
+            try {
+                $domainRecord = $reader->city($result->result->domain_ip);
+                $result->result->latitude = $domainRecord->location->latitude;
+                $result->result->longitude = $domainRecord->location->longitude;
+            } catch(Exception $e) {}
         }
     }
 
