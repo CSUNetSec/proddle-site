@@ -87,7 +87,7 @@
                             tr.insertCell().appendChild(document.createTextNode(vantage.measurement));
                             tr.insertCell().appendChild(document.createTextNode(vantage.count));
 
-                            addMarker(vantage.hostname, vantage.ip_address, vantage.latitude, vantage.longitude, markerInfo, markers);
+                            addMarker(vantage.hostname, vantage.ip_address, vantage.latitude, vantage.longitude, COLOR.RED, markerInfo, markers);
                         }
 
                         plotMarkers(markerInfo, markers);

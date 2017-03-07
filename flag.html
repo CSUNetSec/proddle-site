@@ -150,7 +150,7 @@
                             tr.insertCell().appendChild(document.createTextNode(flag.status));
                             tr.insertCell().appendChild(document.createTextNode(flag.analyzer));
 
-                            addMarker(flag.hostname, flag.ip_address, flag.latitude, flag.longitude, markerInfo, markers);
+                            addMarker(flag.hostname, flag.ip_address, flag.latitude, flag.longitude, COLOR.RED, markerInfo, markers);
                         }
 
                         plotMarkers(markerInfo, markers);

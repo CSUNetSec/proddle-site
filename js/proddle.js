@@ -1,3 +1,16 @@
+var COLOR = {
+    BLUE: 0,
+    BROWN: 1,
+    DARK_GREEN: 2,
+    GREEN: 3,
+    ORANGE: 4,
+    PALE_BLUE: 5,
+    PINK: 6,
+    PURPLE: 7,
+    RED: 8,
+    YELLOW: 9
+};
+
 function addHeaderColumns(table, headerColumns) {
     var tr = table.insertRow();
     for (var i=0; i<headerColumns.length; i++) {
@@ -21,8 +34,7 @@ function formatDate(date) {
         ' UTC';
 }
 
-
-function addMarker(name, ipAddress, latitude, longitude, markerInfo, markers) {
+function addMarker(name, ipAddress, latitude, longitude, color, markerInfo, markers) {
     //check if name is already in marker info
     if (markerInfo.has(name)) {
         var information = markerInfo.get(name);
@@ -45,12 +57,12 @@ function addMarker(name, ipAddress, latitude, longitude, markerInfo, markers) {
 
         var ipAddresses = [];
         ipAddresses.push(ipAddress);
-        information.set({'latitude':latitude,'longitude':longitude}, ipAddresses);
+        information.set({'latitude':latitude,'longitude':longitude,'color':color}, ipAddresses);
     } else {
         var ipAddresses = [];
         ipAddresses.push(ipAddress);
         var information = new Map();
-        information.set({'latitude':latitude,'longitude':longitude}, ipAddresses);
+        information.set({'latitude':latitude,'longitude':longitude,'color':color}, ipAddresses);
         markerInfo.set(name, information);
     }
 }
@@ -58,11 +70,26 @@ function addMarker(name, ipAddress, latitude, longitude, markerInfo, markers) {
 function plotMarkers(markerInfo, markers) {
     for (var [name, information] of markerInfo) {
         for (var [coordinates, ipAddresses] of information) {
+            var image = '../images/google-maps-markers/';
+            switch (coordinates.color) {
+                case COLOR.BLUE:
+                    image += 'blue';
+                    break;
+                case COLOR.GREEN:
+                    image += 'green';
+                    break;
+                case COLOR.RED:
+                    image += 'red';
+                    break;
+            }
+            image += '_Marker' + name.toUpperCase()[0] + '.png';
+
             //create marker
             var marker = new google.maps.Marker({
                 position: {lat: coordinates.latitude, lng: coordinates.longitude},
-                label: name.toUpperCase()[0],
+                //label: name.toUpperCase()[0],
                 map: map,
+                icon: image,
                 clickable: true
             });
 

@@ -96,7 +96,7 @@
                             tr.insertCell().appendChild(document.createTextNode(result.domain));
 
                             if (result.result != null && result.result.domain_ip != null) {
-                                addMarker(result.domain, result.result.domain_ip, result.result.latitude, result.result.longitude, markerInfo, markers);
+                                addMarker(result.domain, result.result.domain_ip, result.result.latitude, result.result.longitude, COLOR.BLUE, markerInfo, markers);
                             }
 
                             if (result.result != null && result.result.error != null) {
@@ -106,7 +106,7 @@
                             }
 
                             //add markers to page
-                            addMarker(result.hostname, result.ip_address, result.latitude, result.longitude, markerInfo, markers);
+                            addMarker(result.hostname, result.ip_address, result.latitude, result.longitude, COLOR.RED, markerInfo, markers);
                         }
 
                         plotMarkers(markerInfo, markers);
