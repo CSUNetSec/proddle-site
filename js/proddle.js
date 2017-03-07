@@ -29,7 +29,7 @@ function addMarker(name, ipAddress, latitude, longitude, markerInfo, markers) {
 
         //check if coordinates are already in information
         for (var [coordinates, ipAddresses] of information) {
-            if (coordinates.latitude == latitude && coordinages.longitude == longitude) {
+            if (coordinates.latitude == latitude && coordinates.longitude == longitude) {
 
                 //check if ip address is already in store
                 for (var i=0; i<ipAddresses.length; i++) {

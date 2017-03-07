@@ -48,8 +48,8 @@
         <script>
             var map;
             var infoWindow;
-            var markers;
-            var markerIpAddresses;
+            var markers = [];
+            var markerInfo = new Map();
 
             function initMap() {
                 infoWindow = new google.maps.InfoWindow;
@@ -57,8 +57,6 @@
                     center: {lat:0, lng: 0},
                     zoom: 2
                 });
-
-                markers = [];
             }
 
             function resetPage() {
@@ -68,8 +66,8 @@
                     markers[i].setMap(null);
                 }
 
-                markers = [];
-                markerIpAddresses = [];
+                markers.length = 0;
+                markerInfo.clear();
             }
 
             function updatePage() {
@@ -98,7 +96,7 @@
                             tr.insertCell().appendChild(document.createTextNode(result.domain));
 
                             if (result.result != null && result.result.domain_ip != null) {
-                                addMarker(result.domain, result.result.domain_ip, result.result.latitude, result.result.longitude);
+                                addMarker(result.domain, result.result.domain_ip, result.result.latitude, result.result.longitude, markerInfo, markers);
                             }
 
                             if (result.result != null && result.result.error != null) {
@@ -108,8 +106,10 @@
                             }
 
                             //add markers to page
-                            addMarker(result.hostname, result.ip_address, result.latitude, result.longitude);
+                            addMarker(result.hostname, result.ip_address, result.latitude, result.longitude, markerInfo, markers);
                         }
+
+                        plotMarkers(markerInfo, markers);
                     }
                 });
 
@@ -129,34 +129,6 @@
                 };
 
                 return link;
-            }
-
-            function addMarker(name, ipAddress, latitude, longitude) {
-                //check if ip addresses has already been marked
-                for (var i=0; i<markerIpAddresses.length; i++) {
-                    if (markerIpAddresses[i] == ipAddress) {
-                        return;
-                    }
-                }
-
-                //create marker
-                var marker = new google.maps.Marker({
-                    position: {lat: latitude, lng: longitude},
-                    label: name.toUpperCase()[0],
-                    map: map,
-                    clickable: true
-                });
-
-                google.maps.event.addListener(marker, 'click', function() {
-                    infoWindow.setContent('<div id=content>' +
-                        '<strong>' + name + '</strong>' +
-                        '<br>' + ipAddress +
-                        '</div>');
-                    infoWindow.open(map, marker);
-                });
-
-                markers.push(marker);
-                markerIpAddresses.push(ipAddress);
             }
         </script>
 
