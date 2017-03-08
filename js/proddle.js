@@ -1,14 +1,7 @@
 var COLOR = {
     BLUE: 0,
-    BROWN: 1,
-    DARK_GREEN: 2,
-    GREEN: 3,
-    ORANGE: 4,
-    PALE_BLUE: 5,
-    PINK: 6,
-    PURPLE: 7,
-    RED: 8,
-    YELLOW: 9
+    GREEN: 1,
+    RED: 2,
 };
 
 function addHeaderColumns(table, headerColumns) {
@@ -70,7 +63,7 @@ function addMarker(name, ipAddress, latitude, longitude, color, markerInfo, mark
 function plotMarkers(markerInfo, markers) {
     for (var [name, information] of markerInfo) {
         for (var [coordinates, ipAddresses] of information) {
-            var image = '../images/google-maps-markers/';
+            var image = '../images/';
             switch (coordinates.color) {
                 case COLOR.BLUE:
                     image += 'blue';
@@ -82,7 +75,7 @@ function plotMarkers(markerInfo, markers) {
                     image += 'red';
                     break;
             }
-            image += '_Marker' + name.toUpperCase()[0] + '.png';
+            image += '-icons/letter_' + name.toLowerCase()[0] + '.png';
 
             //create marker
             var marker = new google.maps.Marker({
