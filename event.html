@@ -1,0 +1,184 @@
+<!DOCTYPE html>
+<html>
+    <head>
+        <title>Proddle - Vantage</title>
+        <link rel="stylesheet" type="text/css" href="css/proddle.css" />
+        <link rel="stylesheet" type="text/css" href="css/map-report.css" />
+        <style>
+        </style>
+        <script src="js/proddle.js"></script>
+        <script src="https://ajax.googleapis.com/ajax/libs/jquery/3.1.1/jquery.min.js"></script>
+    </head>
+    <body>
+        <?php
+            include 'php/header.php';
+        ?>
+        
+        <div id="center">
+            <div id="usage">
+                <h3>Usage</h3>
+                <p>
+                    This page is used to view flags for each domain/url. The
+                    select menu presents durations over which to view the data.
+                </p>
+            </div>
+            <div id="searchbar">
+                Domain: <input type="text" id="domain" value="" />
+                <select id="duration">
+                    <option value="1">1 Day</option>
+                    <option value="7">1 Week</option>
+                    <option value="31">1 Month</option>
+                </select>
+                <input type="button" value="GO" onclick="updateEvents();" />
+            </div>
+            </br>
+            <table class="report">
+                <thead>
+                    <th>Domain</th>
+                    <th>Start Time</th>
+                    <th>End Time</th>
+                    <th>Flag Count</th>
+                </thead>
+                <tbody id="events"></tbody>
+            </table>
+            </br>
+            <div id="map"></div>
+            </br>
+            <div id="mapreport" class="report"></div>
+            </br>
+            <p>
+                This product includes GeoLite2 data created by MaxMind, available from
+                <a href="http://www.maxmind.com">http://www.maxmind.com</a>.
+            </p>
+        </div>
+
+        <script>
+            var map;
+            var infoWindow;
+            var markers = [];
+            var markerInfo = new Map();
+
+            function initMap() {
+                infoWindow = new google.maps.InfoWindow;
+                map = new google.maps.Map(document.getElementById('map'), {
+                    center: {lat:0, lng: 0},
+                    zoom: 2
+                });
+
+                updateEvents();
+            }
+
+            function resetPage() {
+                document.getElementById('events').innerHTML = '';
+                document.getElementById('mapreport').innerHTML = '';
+
+                for (var i=0; i < markers.length; i++) {
+                    markers[i].setMap(null);
+                }
+
+                markers.length = 0;
+                markerInfo.clear();
+            }
+
+            function updateEvents() {
+                resetPage();
+                var domain = document.getElementById('domain').value;
+                var duration = document.getElementById('duration');
+                var events = document.getElementById('events');
+                var mapTable = document.createElement('table');
+
+                //query event_report.html
+                $.get({
+                    url: 'event_report.html?duration=' + duration.options[duration.selectedIndex].value + (domain != '' ? '&domain=' + domain : ''),
+                    dataType: 'json',
+                    success: function(data) {
+                        for (var i=0; i<data.result.length; i++) {
+                            var e = data.result[i];
+
+                            var tr = events.insertRow();
+                            tr.insertCell().appendChild(document.createTextNode(e.domain));
+                            var minimum_timestamp = new Date(e.minimum_timestamp * 1000);
+                            tr.insertCell().appendChild(document.createTextNode(formatDate(minimum_timestamp)));
+                            var maximum_timestamp = new Date(e.maximum_timestamp * 1000);
+                            tr.insertCell().appendChild(document.createTextNode(formatDate(maximum_timestamp)));
+                            tr.insertCell().appendChild(document.createTextNode(e.flag_ids.length));
+                        }
+                    }
+                });
+            }
+
+            function updatePage() {
+                resetPage();
+                var domain = document.getElementById('domain').value;
+                var duration = document.getElementById('duration');
+                var topFlagsTable = document.createElement('table');
+                var flagStatusesTable = document.createElement('table');
+                var flagAnalyzersTable = document.createElement('table');
+                var mapTable = document.createElement('table');
+
+                //add table header
+                topFlagsTable.createCaption().innerHTML = '<b>Top 10 Flagged Urls</b>';
+                addHeaderColumns(topFlagsTable, ['Domain', 'Url', 'Count']);
+                flagStatusesTable.createCaption().innerHTML = '<b>Flag Count By Status</b>';
+                addHeaderColumns(flagStatusesTable, ['Status', 'Count']);
+                flagAnalyzersTable.createCaption().innerHTML = '<b>Flag Count By Analyzer</b>';
+                addHeaderColumns(flagAnalyzersTable, ['Analyzer', 'Count']);
+                mapTable.createCaption().innerHTML = '<b>25 Most Recent Flags</b>'
+                addHeaderColumns(mapTable, ['Timestamp', 'Vantage', 'Domain', 'Url', 'Status', 'Analyzer']);
+
+                //query php/vantage_report.php
+                $.get({
+                    url: 'flag_report.html?duration=' + duration.options[duration.selectedIndex].value + (domain != '' ? '&domain=' + domain : ''),
+                    dataType: 'json',
+                    success: function(data) {
+                        for (var i=0; i<data.top_flags.length; i++) {
+                            var topFlag = data.top_flags[i];
+                            var tr = topFlagsTable.insertRow();
+                            tr.insertCell().appendChild(document.createTextNode(topFlag.domain));
+                            tr.insertCell().appendChild(document.createTextNode(topFlag.url));
+                            tr.insertCell().appendChild(document.createTextNode(topFlag.count));
+                        }
+
+                        for (var i=0; i<data.flag_statuses.length; i++) {
+                            var flagStatus = data.flag_statuses[i];
+                            var tr = flagStatusesTable.insertRow();
+                            tr.insertCell().appendChild(document.createTextNode(flagStatus.status));
+                            tr.insertCell().appendChild(document.createTextNode(flagStatus.count));
+                        }
+
+                        for (var i=0; i<data.flag_analyzers.length; i++) {
+                            var flagAnalyzer = data.flag_analyzers[i];
+                            var tr = flagAnalyzersTable.insertRow();
+                            tr.insertCell().appendChild(document.createTextNode(flagAnalyzer.analyzer));
+                            tr.insertCell().appendChild(document.createTextNode(flagAnalyzer.count));
+                        }
+
+                        for (var i=0; i<data.flags.length; i++) {
+                            var flag = data.flags[i];
+                            var tr = mapTable.insertRow();
+                            var timestamp = new Date(flag.timestamp * 1000);
+                            tr.insertCell().appendChild(document.createTextNode(formatDate(timestamp)));
+                            tr.insertCell().appendChild(document.createTextNode(flag.hostname + ' (' + flag.ip_address + ')'));
+                            tr.insertCell().appendChild(document.createTextNode(flag.domain));
+                            tr.insertCell().appendChild(document.createTextNode(flag.url));
+                            tr.insertCell().appendChild(document.createTextNode(flag.status));
+                            tr.insertCell().appendChild(document.createTextNode(flag.analyzer));
+
+                            addMarker(flag.hostname, flag.ip_address, flag.latitude, flag.longitude, COLOR.RED, markerInfo, markers);
+                        }
+
+                        plotMarkers(markerInfo, markers);
+                    }
+                });
+
+                document.getElementById('topflags').appendChild(topFlagsTable);
+                document.getElementById('flagstatuses').appendChild(flagStatusesTable);
+                document.getElementById('flaganalyzers').appendChild(flagAnalyzersTable);
+                document.getElementById('mapreport').appendChild(mapTable);
+            }
+        </script>
+
+        <script src="https://maps.googleapis.com/maps/api/js?key=AIzaSyAeCkjmEFtZ0Wuu6muxH6-4RF6f-pzE3qc&callback=initMap" 
+        async defer></script>
+    </body>
+</html>

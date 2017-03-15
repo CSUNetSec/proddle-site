@@ -5,11 +5,11 @@ var COLOR = {
 };
 
 function addHeaderColumns(table, headerColumns) {
-    var tr = table.insertRow();
+    var thead = document.createElement('thead');
+    table.appendChild(thead);
+    var tr = thead.insertRow();
     for (var i=0; i<headerColumns.length; i++) {
-        var th = document.createElement('th');
-        th.appendChild(document.createTextNode(headerColumns[i]));
-        tr.appendChild(th);
+        tr.insertCell().appendChild(document.createTextNode(headerColumns[i]));
     }
 }
 
