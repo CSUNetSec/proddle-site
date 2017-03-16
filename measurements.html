@@ -94,9 +94,9 @@
                 var duration = document.getElementById('duration');
                 var measurementsBody = document.getElementById('measurementsBody');
 
-                //query php/measurement_report.php
+                //query measurements_report.html
                 $.get({
-                    url: 'measurement_report.html?domain=' + domain + '&duration=' + duration.options[duration.selectedIndex].value,
+                    url: 'measurements_report.html?domain=' + domain + '&duration=' + duration.options[duration.selectedIndex].value,
                     dataType: 'json',
                     success: function(data) {
                         for (var i=0; i < data.length; i++) {

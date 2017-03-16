@@ -1,7 +1,7 @@
 <!DOCTYPE html>
 <html>
     <head>
-        <title>Proddle - Event</title>
+        <title>Proddle - Events</title>
         <link rel="stylesheet" type="text/css" href="css/events.css" />
         <link rel="stylesheet" type="text/css" href="css/map.css" />
         <link rel="stylesheet" type="text/css" href="css/proddle.css" />
@@ -90,9 +90,9 @@
                 var eventsBody = document.getElementById('eventsBody');
                 var mapTable = document.createElement('table');
 
-                //query event_report.html
+                //query events_report.html
                 $.get({
-                    url: 'event_report.html?duration=' + duration.options[duration.selectedIndex].value + (domain != '' ? '&domain=' + domain : ''),
+                    url: 'events_report.html?duration=' + duration.options[duration.selectedIndex].value + (domain != '' ? '&domain=' + domain : ''),
                     dataType: 'json',
                     success: function(data) {
                         for (var i=0; i<data.result.length; i++) {

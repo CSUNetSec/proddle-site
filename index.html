@@ -131,9 +131,9 @@
 
                 var vantagesBody = document.getElementById('vantagesBody');
 
-                //query vantage_report.html
+                //query vantages_report.html
                 $.get({
-                    url: 'vantage_report.html?duration=1',
+                    url: 'vantages_report.html?duration=1',
                     dataType: 'json',
                     success: function(data) {
                         for (var i=0; i<data.vantages.length; i++) {
