@@ -48,7 +48,22 @@
             </br>
             <div id="map"></div>
             </br>
-            <div class="report"></div>
+            <div class="wrapper">
+                <caption><b>Measurements Collected By Proddle</b></caption>
+                <div id="measurementsScroll" class="scroll">
+                    <table id="measurementsTable" class="report">
+                        <thead>
+                            <th>Timestamp</th>
+                            <th>Vantage</th>
+                            <th>Measurement</th>
+                            <th>Domain</th>
+                            <th>Status</th>
+                        </thead>
+                        <tbody id="measurementsBody">
+                        </tbody>
+                    </table>
+                </div>
+            </div>
             </br>
             <p>
                 This product includes GeoLite2 data created by MaxMind, available from
@@ -74,13 +89,7 @@
 
             function resetPage() {
                 document.getElementById('eventsBody').innerHTML = '';
-
-                for (var i=0; i < markers.length; i++) {
-                    markers[i].setMap(null);
-                }
-
-                markers.length = 0;
-                markerInfo.clear();
+                resetEvent();
             }
 
             function updateEvents() {
@@ -99,7 +108,7 @@
                             var e = data.result[i];
 
                             var tr = eventsBody.insertRow();
-                            tr.onclick = createClickHandler(e.domain);
+                            tr.onclick = createEventClickHandler(e);
                             tr.insertCell().appendChild(document.createTextNode(e.domain));
                             var minimum_timestamp = new Date(e.minimum_timestamp * 1000);
                             tr.insertCell().appendChild(document.createTextNode(formatDate(minimum_timestamp)));
@@ -111,9 +120,70 @@
                 });
             }
 
-            function createClickHandler(domain) {
+            function createEventClickHandler(e) {
                 return function() {
-                    alert('clicked row! ' + domain);
+                    updateEvent(e.domain, e.minimum_timestamp, e.maximum_timestamp);
+                };
+            }
+
+            function resetEvent() {
+                document.getElementById('measurementsBody').innerHTML = '';
+
+                for (var i=0; i < markers.length; i++) {
+                    markers[i].setMap(null);
+                }
+
+                markers.length = 0;
+                markerInfo.clear();
+            }
+
+            function updateEvent(domain, start_time, end_time) {
+                resetEvent();
+
+                var measurementsBody = document.getElementById('measurementsBody');
+
+                //query flags_report.html
+                $.get({
+                    url: 'flags_report.html?domain=' + domain + '&start_time=' + (start_time - 3600) + '&end_time=' + (end_time + 3600),
+                    dataType: 'json',
+                    success: function(data) {
+                        for (var i=0; i < data.length; i++) {
+                            var result = data[i];
+                            
+                            var tr = measurementsBody.insertRow();
+                            tr.onclick = createMeasurementClickHandler(result);
+                            var timestamp = new Date(result.timestamp * 1000);
+                            tr.insertCell().appendChild(document.createTextNode(formatDate(timestamp)));
+                            tr.insertCell().appendChild(document.createTextNode(result.hostname + ' (' + result.ip_address + ')'));
+                            tr.insertCell().appendChild(document.createTextNode(result.measurement));
+                            tr.insertCell().appendChild(document.createTextNode(result.domain));
+
+                            if (result.result != null && result.result.domain_ip != null) {
+                                addMarker(result.domain, result.result.domain_ip, result.result.latitude, result.result.longitude, COLOR.BLUE, markerInfo, markers);
+                            }
+
+                            if (result.result != null && result.result.error != null) {
+                                tr.insertCell().appendChild(document.createTextNode(result.result.error ? 'down' : 'up'));
+                            } else {
+                                tr.insertCell().appendChild(document.createTextNode(result.error ? 'unknown' : 'up'));
+                            }
+
+                            //add markers to page
+                            addMarker(result.hostname, result.ip_address, result.latitude, result.longitude, COLOR.RED, markerInfo, markers);
+                        }
+
+                        plotMarkers(markerInfo, markers);
+                    }
+                });
+            }
+
+            function createMeasurementClickHandler(result) {
+                return function() {
+                    if (result.result != null) {
+                        alert(JSON.stringify(result.result, null, 4));
+                    } else {
+                        alert('No result to display');
+                    }
                 };
             }
         </script>

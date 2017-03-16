@@ -5,3 +5,11 @@ div#eventsScroll {
 table#eventsTable tbody tr:hover {
     background-color: #dddddd;
 }
+
+div#measurementsScroll {
+    max-height: 250px;
+}
+
+table#measurementsTable tbody tr:hover {
+    background-color: #dddddd;
+}

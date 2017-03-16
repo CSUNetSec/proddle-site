@@ -1,0 +1,85 @@
+<?php
+require_once 'php/vendor/autoload.php';
+require_once 'php/login.php';
+
+//parse command line parameters
+if (isset($_GET['domain'])) $domain=$_GET['domain'];
+else $domain='meb.k12.tr';
+//else $domain='google.com';
+
+if (isset($_GET['start_time'])) $start_time=(int)$_GET['start_time'];
+else $start_time=time() - (24 * 60 * 60);
+
+if (isset($_GET['end_time'])) $end_time=(int)$_GET['end_time'];
+else $end_time=time();
+
+//open driver manager and geoip reader
+$manager = new MongoDB\Driver\Manager(
+    $mongodbConnectionString,
+    [
+        'ssl' => TRUE,
+        'username' => $mongodbUsername,
+        'password' => $mongodbPassword,
+        'authSource' => $mongodbAuthSource
+    ],
+    [
+        'ca_file' => $mongodbSslCaCert,
+        'pem_file' => $mongodbSslPem
+    ]
+);
+$reader = new GeoIp2\Database\Reader('/usr/local/share/GeoLite2/GeoLite2-City.mmdb');
+
+//query for flags
+$flag_cursor = $manager->executeQuery(
+    'tipup.flags',
+    new MongoDB\Driver\Query(
+        ['timestamp' => ['$gte' => $start_time, '$lte' => $end_time], 'domain' => $domain],
+        ['sort' => ['timestamp' => -1]]
+    )
+);
+
+$flag_array = $flag_cursor->toArray();
+
+//query for measurements
+$result_cursor = $manager->executeQuery(
+    'proddle.results',
+    new MongoDB\Driver\Query(
+        ['timestamp' => ['$gte' => $start_time, '$lte' => $end_time], 'domain' => $domain],
+        ['sort' => ['timestamp' => -1]]
+    )
+);
+
+//iterate over results
+$result_array = $result_cursor->toArray();
+
+echo '[';
+for ($i=0; $i < count($result_array); ++$i) {
+    $result = $result_array[$i];
+
+    //gelocate ip address
+    $record = $reader->city($result->ip_address);
+    $result->latitude = $record->location->latitude;
+    $result->longitude = $record->location->longitude;
+
+    if (isset($result->result)) {
+        if (isset($result->result->domain_ip)) {
+            try {
+                $domainRecord = $reader->city($result->result->domain_ip);
+                $result->result->latitude = $domainRecord->location->latitude;
+                $result->result->longitude = $domainRecord->location->longitude;
+            } catch(Exception $e) {}
+        }
+    }
+
+    //populate result with flag attribute if necessary
+    for ($j=0; $j < count($flag_array); ++$j) {
+        $flag = $flag_array[$j];
+        if ($flag->measurement_id == $result->_id) {
+            $result->flag = $flag;
+        }
+    }
+
+    echo ($i != 0 ? ',' : '') . MongoDB\BSON\toJSON(MongoDB\BSON\fromPHP($result));
+}
+echo ']';
+?>
