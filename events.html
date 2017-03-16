@@ -18,7 +18,20 @@
             <div id="usage">
                 <h3>Usage</h3>
                 <p>
-                    TODO
+                    This page is used to view events for particular domain(s).
+                    The text area should be populated by the domain name 
+                    (ex. google.com), if left blank events for all domains 
+                    will be displayed. The select menu presents the lowest 
+                    timeframe where the event was active. For example, a
+                    duration of '1 Day' means all the events have been active
+                    in the last day.
+                </p>
+                <p>
+                    Clicking on an event row in the the table will populate
+                    both the map and the measurements table with information
+                    relevant to the event. Additionally clicking on a
+                    measurement row in the measurements table will display
+                    specific information about that measurement.
                 </p>
             </div>
             <div id="searchbar">
@@ -179,11 +192,7 @@
 
             function createMeasurementClickHandler(result) {
                 return function() {
-                    if (result.result != null) {
-                        alert(JSON.stringify(result.result, null, 4));
-                    } else {
-                        alert('No result to display');
-                    }
+                    alert(JSON.stringify(result, null, 4));
                 };
             }
         </script>
