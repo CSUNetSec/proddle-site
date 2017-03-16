@@ -1,0 +1,13 @@
+table#measurementstable tbody {
+    height: 200px;
+}
+
+table#measurementstable tbody tr:hover {
+    background-color: #dddddd;
+}
+
+table#measurementstable tbody td,
+table#measurementstable thead th {
+    width: 19.4%;
+    float: left;
+}

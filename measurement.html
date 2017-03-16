@@ -1,9 +1,11 @@
 <!DOCTYPE html>
 <html>
     <head>
-        <title>Proddle - Domain</title>
+        <title>Proddle - Measurements</title>
+        <link rel="stylesheet" type="text/css" href="css/map.css" />
+        <link rel="stylesheet" type="text/css" href="css/measurements.css" />
         <link rel="stylesheet" type="text/css" href="css/proddle.css" />
-        <link rel="stylesheet" type="text/css" href="css/map-report.css" />
+        <link rel="stylesheet" type="text/css" href="css/report-table.css" />
         <style>
             .resultlink {
                 text-decoration: underline;
@@ -38,6 +40,17 @@
             </br>
             <div id="map"></div>
             </br>
+            <table id="measurementstable" class="report">
+                <thead>
+                    <th>Timestamp</th>
+                    <th>Vantage</th>
+                    <th>Measurement</th>
+                    <th>Domain</th>
+                    <th>Status</th>
+                </thead>
+                <tbody id="measurements">
+                </tbody>
+            </table>
             <div id="mapreport" class="report"></div>
             <p>
                 This product includes GeoLite2 data created by MaxMind, available from
@@ -60,7 +73,7 @@
             }
 
             function resetPage() {
-                document.getElementById('mapreport').innerHTML = '';
+                document.getElementById('measurements').innerHTML = '';
 
                 for (var i=0; i < markers.length; i++) {
                     markers[i].setMap(null);
@@ -74,11 +87,7 @@
                 resetPage();
                 var domain = document.getElementById('domain').value;
                 var duration = document.getElementById('duration');
-                var table = document.createElement('table');
-
-                //add table header
-                table.createCaption().innerHTML = '<b>Measurements By Domain</b>';
-                addHeaderColumns(table, ['Timestamp', 'Vantage', 'Measurement', 'Domain', 'Status']);
+                var measurements = document.getElementById('measurements');
 
                 //query php/measurement_report.php
                 $.get({
@@ -88,11 +97,12 @@
                         for (var i=0; i < data.length; i++) {
                             var result = data[i];
                             
-                            var tr = table.insertRow();
+                            var tr = measurements.insertRow();
+                            tr.onclick = createClickHandler(result);
                             var timestamp = new Date(result.timestamp * 1000);
                             tr.insertCell().appendChild(document.createTextNode(formatDate(timestamp)));
                             tr.insertCell().appendChild(document.createTextNode(result.hostname + ' (' + result.ip_address + ')'));
-                            tr.insertCell().appendChild(createLink(result));
+                            tr.insertCell().appendChild(document.createTextNode(result.measurement));
                             tr.insertCell().appendChild(document.createTextNode(result.domain));
 
                             if (result.result != null && result.result.domain_ip != null) {
@@ -112,23 +122,16 @@
                         plotMarkers(markerInfo, markers);
                     }
                 });
-
-                document.getElementById('mapreport').appendChild(table);
             }
 
-            function createLink(result) {
-                var link = document.createElement('a');
-                link.className = 'resultlink';
-                link.appendChild(document.createTextNode(result.measurement));
-                link.onclick = function() {
+            function createClickHandler(result) {
+                return function() {
                     if (result.result != null) {
                         alert(JSON.stringify(result.result, null, 4));
                     } else {
                         alert('No result to display');
                     }
                 };
-
-                return link;
             }
         </script>
 
