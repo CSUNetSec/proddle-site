@@ -21,8 +21,8 @@
                 at Colorado State University in the Network Security research
                 group. The aim of the project is to perform periodic service
                 level measurements from geographically diverse vantage points
-                to determine DDoS and similar networking
-                anomalies. There are many well established projects actively 
+                to determine domain availability and similar networking
+                failures. There are many well established projects actively 
                 probing the Internet. While Proddle offers the ability to 
                 perform network level measurements (ping, traceroute, etc) we
                 propose analyzing a higher layer to closer mimic user interaction.
@@ -32,6 +32,12 @@
             </p>
 
             <h3>Vantages</h3>
+            <p>
+                Currently all of our vantages are hosted on Microsoft's Azure
+                cloud infrastructure under a generous research sponsorship. We
+                are very interested in deploying additional instances.
+            </p>
+            </br>
             <div id="map"></div>
             </br>
             <div class="wrapper">
@@ -52,19 +58,18 @@
 
             <h3>Results</h3>
             <p>
-                To begin, as a research centric project all results are made
-                publicly available. We believe this is a dataset that's currently
-                unavailable to the broader community and has the potential to 
-                spark new and interesting research initiatives. Results are
-                stored as JSON strings, but we are willing to provide a different
-                format for interested parties. Feel free to contact us.
+                As a research centric project all measurement results are 
+                made publicly available. We believe this is a dataset that's 
+                currently unavailable to the broader community and has the potential 
+                to spark new and interesting research initiatives.
             </p>
 
             <p>
                 As stated previously, all results are stored in JSON format. This
                 allows for an unparalleled level of verbosity. Our current HTTP
                 GET measurement stores application layer latency, DNS resolution,
-                redirect count, reply content, HTTP status codes, and much more.
+                redirect count, reply content, HTTP status codes, URL redirects 
+                and much more.
             </p>
 
             <h3>Collaboration</h3>
@@ -73,9 +78,10 @@
                 The most obvious being deploying a vantage point locally. As
                 the project is in it's infancy this is a fairly manual process,
                 but intial efforts at containerizing the application using docker
-                have been fairly success. Another mutually useful effort would 
-                be to use the data for interesting research. we are quite 
-                happy to entertain alternative formats on request. Any additional
+                have been met with success. Another mutually useful effort would 
+                be to use the data for interesting research. Currently, all 
+                measurement results are stored as JSON, alas we are quite open
+                to providing alternative formats on request. Any additional
                 thoughts on increasing the communites scope of the project will
                 be well recieved. 
             </p>
@@ -89,13 +95,13 @@
                 interesting project that stores information in JSON documents.
                 Additionally it provides data replication and sharding required
                 of most modern database deployments. On top of that we have
-                implemented a very lightweight server application that acts as
+                implemented a very lightweight bridge application to transport data
+                from vantages to the backend. A bridge acts as
                 a passive entity, meaning all communication is initiated by the
-                vantage points. The server handles all communication between the
-                vantage points and MongoDB. The final component is the vantage
+                vantage points. The final component is the vantage
                 point. It's purpose is to actively perform measurements and relay
-                results to servers. It should be noted that implementation is such
-                that multiple servers will be running over a MongoDB replication
+                results to bridges. It should be noted that implementation is such
+                that multiple bridges will be running over a MongoDB replication
                 cluster. Therefore the system has a fail-safe in the case of 
                 unreachability.
             </p>
@@ -109,10 +115,10 @@
             </p>
 
             <ul>
-                <li>Dan Rammer (PhD Student - Colorado State University)</li>
+                <li>Dan Rammer - rammerdATramsDOTcolostateDOTedu - (PhD Student - Colorado State University)</li>
                 <li>Dimitris Kounalakis (Research Associate - Colorado State University)</li>
                 <li>Spiros Thanasoulas (Research Associate - Colorado State University)</li>
-                <li>Christos Papadopoulos (Professor/Advisor - Colorado State University)</li>
+                <li>Christos Papadopoulos (Professor - Colorado State University)</li>
             </ul>
         </div>
 
