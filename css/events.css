@@ -1,13 +1,7 @@
-table#eventstable tbody {
-    height: 200px;
+div#eventsScroll {
+    max-height: 150px;
 }
 
-table#eventstable tbody tr:hover {
+table#eventsTable tbody tr:hover {
     background-color: #dddddd;
-}
-
-table#eventstable tbody td,
-table#eventstable thead th {
-    width: 24.25%;
-    float: left;
 }

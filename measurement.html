@@ -40,19 +40,23 @@
             </br>
             <div id="map"></div>
             </br>
-            <table id="measurementstable" class="report">
+            <div class="wrapper">
                 <caption><b>Measurements Collected By Proddle</b></caption>
-                <thead>
-                    <th>Timestamp</th>
-                    <th>Vantage</th>
-                    <th>Measurement</th>
-                    <th>Domain</th>
-                    <th>Status</th>
-                </thead>
-                <tbody id="measurements">
-                </tbody>
-            </table>
-            <div id="mapreport" class="report"></div>
+                <div id="measurementsScroll" class="scroll">
+                    <table id="measurementsTable" class="report">
+                        <thead>
+                            <th>Timestamp</th>
+                            <th>Vantage</th>
+                            <th>Measurement</th>
+                            <th>Domain</th>
+                            <th>Status</th>
+                        </thead>
+                        <tbody id="measurementsBody">
+                        </tbody>
+                    </table>
+                </div>
+            </div>
+            </br>
             <p>
                 This product includes GeoLite2 data created by MaxMind, available from
                 <a href="http://www.maxmind.com">http://www.maxmind.com</a>.
@@ -74,7 +78,7 @@
             }
 
             function resetPage() {
-                document.getElementById('measurements').innerHTML = '';
+                document.getElementById('measurementsBody').innerHTML = '';
 
                 for (var i=0; i < markers.length; i++) {
                     markers[i].setMap(null);
@@ -88,7 +92,7 @@
                 resetPage();
                 var domain = document.getElementById('domain').value;
                 var duration = document.getElementById('duration');
-                var measurements = document.getElementById('measurements');
+                var measurementsBody = document.getElementById('measurementsBody');
 
                 //query php/measurement_report.php
                 $.get({
@@ -98,7 +102,7 @@
                         for (var i=0; i < data.length; i++) {
                             var result = data[i];
                             
-                            var tr = measurements.insertRow();
+                            var tr = measurementsBody.insertRow();
                             tr.onclick = createClickHandler(result);
                             var timestamp = new Date(result.timestamp * 1000);
                             tr.insertCell().appendChild(document.createTextNode(formatDate(timestamp)));

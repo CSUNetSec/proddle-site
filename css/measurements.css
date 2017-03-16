@@ -1,13 +1,7 @@
-table#measurementstable tbody {
-    height: 200px;
+div#measurementsScroll {
+    max-height: 250px;
 }
 
-table#measurementstable tbody tr:hover {
+table#measurementsTable tbody tr:hover {
     background-color: #dddddd;
-}
-
-table#measurementstable tbody td,
-table#measurementstable thead th {
-    width: 19.4%;
-    float: left;
 }

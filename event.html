@@ -31,20 +31,24 @@
                 <input type="button" value="GO" onclick="updateEvents();" />
             </div>
             </br>
-            <table id="eventstable" class="report">
+            <div class="wrapper">
                 <caption><b>Proddle Identified Events</b></caption>
-                <thead>
-                    <th>Domain</th>
-                    <th>Start Time</th>
-                    <th>End Time</th>
-                    <th>Flag Count</th>
-                </thead>
-                <tbody id="events"></tbody>
-            </table>
+                <div id="eventsScroll" class="scroll">
+                    <table id="eventsTable" class="report">
+                        <thead>
+                            <th>Domain</th>
+                            <th>Start Time</th>
+                            <th>End Time</th>
+                            <th>Flag Count</th>
+                        </thead>
+                        <tbody id="eventsBody"></tbody>
+                    </table>
+                </div>
+            </div>
             </br>
             <div id="map"></div>
             </br>
-            <div id="mapreport" class="report"></div>
+            <div class="report"></div>
             </br>
             <p>
                 This product includes GeoLite2 data created by MaxMind, available from
@@ -69,8 +73,7 @@
             }
 
             function resetPage() {
-                document.getElementById('events').innerHTML = '';
-                document.getElementById('mapreport').innerHTML = '';
+                document.getElementById('eventsBody').innerHTML = '';
 
                 for (var i=0; i < markers.length; i++) {
                     markers[i].setMap(null);
@@ -84,7 +87,7 @@
                 resetPage();
                 var domain = document.getElementById('domain').value;
                 var duration = document.getElementById('duration');
-                var events = document.getElementById('events');
+                var eventsBody = document.getElementById('eventsBody');
                 var mapTable = document.createElement('table');
 
                 //query event_report.html
@@ -95,7 +98,7 @@
                         for (var i=0; i<data.result.length; i++) {
                             var e = data.result[i];
 
-                            var tr = events.insertRow();
+                            var tr = eventsBody.insertRow();
                             tr.onclick = createClickHandler(e.domain);
                             tr.insertCell().appendChild(document.createTextNode(e.domain));
                             var minimum_timestamp = new Date(e.minimum_timestamp * 1000);

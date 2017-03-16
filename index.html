@@ -34,16 +34,20 @@
             <h3>Vantages</h3>
             <div id="map"></div>
             </br>
-            <table id="vantagestable" class="report">
+            <div class="wrapper">
                 <caption><b>Active Vantages From Last 24 Hours</b></caption>
-                <thead>
-                    <th>Hostname</th>
-                    <th>Ip Address</th>
-                    <th>Measurement</th>
-                    <th>Count</th>
-                </thead>
-                <tbody id="vantages"></tbody>
-            </table>
+                <div id="vantagesScroll" class="scroll">
+                    <table id="vantagesTable" class="report">
+                        <thead>
+                            <th>Hostname</th>
+                            <th>Ip Address</th>
+                            <th>Measurement</th>
+                            <th>Count</th>
+                        </thead>
+                        <tbody id="vantagesBody"></tbody>
+                    </table>
+                </div>
+            </div>
             </br>
 
             <h3>Results</h3>
@@ -125,7 +129,7 @@
                     zoom: 2
                 });
 
-                var vantages = document.getElementById('vantages');
+                var vantagesBody = document.getElementById('vantagesBody');
 
                 //query vantage_report.html
                 $.get({
@@ -134,7 +138,7 @@
                     success: function(data) {
                         for (var i=0; i<data.vantages.length; i++) {
                             var vantage = data.vantages[i];
-                            var tr = vantages.insertRow();
+                            var tr = vantagesBody.insertRow();
                             tr.insertCell().appendChild(document.createTextNode(vantage.hostname));
                             tr.insertCell().appendChild(document.createTextNode(vantage.ip_address));
                             tr.insertCell().appendChild(document.createTextNode(vantage.measurement));
