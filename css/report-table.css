@@ -1,16 +1,3 @@
-div#usage {
-    text-align: center;
-}
-
-div#searchbar {
-    text-align: center;
-}
-
-div#map {
-    height: 600px;
-}
-
-
 table.report {
     width: 100%;
     border-spacing: 0;
@@ -22,6 +9,10 @@ table.report td,
 table.report tr,
 table.report thead,
 table.report tbody { display: block; }
+
+table.report thead {
+    background-color: #dddddd;
+}
 
 table.report thead tr {
     /* fallback */
@@ -40,7 +31,6 @@ table.report tr:after {
 }
 
 table.report tbody {
-    height: 100px;
     overflow-y: auto;
     overflow-x: hidden;
 
@@ -48,16 +38,9 @@ table.report tbody {
     border-top: 1px solid black;
 }
 
-table.report tbody td,
-table.report thead th {
-    width: 19%;
-    float: left;
-}
-
 table.report thead tr th { 
     height: 30px;
     line-height: 30px;
-    /*text-align: left;*/
 }
 
 table.report tbody td{

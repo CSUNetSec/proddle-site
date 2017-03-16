@@ -1,0 +1,10 @@
+table#eventstable tbody {
+    height: 200px;
+}
+
+table#eventstable tbody td,
+table#eventstable thead th {
+    width: 24.25%;
+    float: left;
+}
+

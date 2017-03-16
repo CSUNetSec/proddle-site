@@ -3,9 +3,9 @@
     <head>
         <title>Proddle - Vantage</title>
         <link rel="stylesheet" type="text/css" href="css/proddle.css" />
-        <link rel="stylesheet" type="text/css" href="css/map-report.css" />
-        <style>
-        </style>
+        <link rel="stylesheet" type="text/css" href="css/events.css" />
+        <link rel="stylesheet" type="text/css" href="css/map.css" />
+        <link rel="stylesheet" type="text/css" href="css/report-table.css" />
         <script src="js/proddle.js"></script>
         <script src="https://ajax.googleapis.com/ajax/libs/jquery/3.1.1/jquery.min.js"></script>
     </head>
@@ -18,8 +18,7 @@
             <div id="usage">
                 <h3>Usage</h3>
                 <p>
-                    This page is used to view flags for each domain/url. The
-                    select menu presents durations over which to view the data.
+                    TODO
                 </p>
             </div>
             <div id="searchbar">
@@ -32,7 +31,7 @@
                 <input type="button" value="GO" onclick="updateEvents();" />
             </div>
             </br>
-            <table class="report">
+            <table id="eventstable" class="report">
                 <thead>
                     <th>Domain</th>
                     <th>Start Time</th>
