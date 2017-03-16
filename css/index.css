@@ -1,0 +1,9 @@
+table#vantagestable tbody {
+    height: 200px;
+}
+
+table#vantagestable tbody td,
+table#vantagestable thead th {
+    width: 24.25%;
+    float: left;
+}
