@@ -142,15 +142,19 @@
                     url: 'vantages_report.html?duration=1',
                     dataType: 'json',
                     success: function(data) {
-                        for (var i=0; i<data.vantages.length; i++) {
-                            var vantage = data.vantages[i];
+                        for (var i=0; i<data.result.length; i++) {
+                            var vantage = data.result[i];
+                            var coordinate = data.coordinates[i];
+
                             var tr = vantagesBody.insertRow();
-                            tr.insertCell().appendChild(document.createTextNode(vantage.hostname));
-                            tr.insertCell().appendChild(document.createTextNode(vantage.ip_address));
-                            tr.insertCell().appendChild(document.createTextNode(vantage.measurement));
+                            tr.insertCell().appendChild(document.createTextNode(vantage._id.vantage_hostname));
+                            tr.insertCell().appendChild(document.createTextNode(vantage._id.vantage_ip_address));
+                            tr.insertCell().appendChild(document.createTextNode(vantage._id.measurement_class));
                             tr.insertCell().appendChild(document.createTextNode(vantage.count));
 
-                            addMarker(vantage.hostname, vantage.ip_address, vantage.latitude, vantage.longitude, COLOR.RED, markerInfo, markers);
+                            if (vantage._id.vantage_ip_address != null && coordinate.vantage != null) {
+                                addMarker(vantage._id.vantage_hostname, vantage._id.vantage_ip_address, coordinate.vantage.latitude, coordinate.vantage.longitude, COLOR.RED, markerInfo, markers);
+                            }
                         }
 
                         plotMarkers(markerInfo, markers);

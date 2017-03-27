@@ -25,35 +25,51 @@ $manager = new MongoDB\Driver\Manager(
 $reader = new GeoIp2\Database\Reader('/usr/local/share/GeoLite2/GeoLite2-City.mmdb');
 
 //query for distinct vantages
-echo '{"vantages":[';
 $cursor = $manager->executeCommand(
     'proddle',
     new MongoDB\Driver\Command(
         [
-            'aggregate' => 'results',
+            'aggregate' => 'measurements',
             'pipeline' => [
-                [
-                    '$match' => ['timestamp' => ['$gte' => $timestamp]]
-                ],
+                ['$match' => ['timestamp' => ['$gte' => $timestamp]]],
                 [
                     '$group' => [
                         '_id' => [
-                            'hostname' => '$hostname',
-                            'ip_address' => '$ip_address',
-                            'measurement' => '$measurement'
+                            'vantage_hostname' => '$vantage_hostname',
+                            'vantage_ip_address' => '$vantage_ip_address',
+                            'measurement_class' => '$measurement_class'
                         ],
                         'count' => ['$sum' => 1]
                     ]
                 ],
-                [
-                    '$sort' => ['hostname' => 1, 'ip_address' => 1, 'measurement' => 1]
-                ]
+                ['$sort' => ['vantage_hostname' => 1, 'vantage_ip_address' => 1, 'measurement_class' => 1]]
             ]
         ]
     )
 );
 
-$array = $cursor->toArray()[0]->result;
+//geolocate vantage
+$array = $cursor->toArray()[0];
+$coordinates = [];
+for ($i=0; $i < count($array->result); ++$i) {
+    $result = $array->result[$i];
+    $coordinate = (object) array();
+
+    if (isset($result->_id->vantage_ip_address)) {
+        $coordinate->vantage = (object) array();
+        $record = $reader->city($result->_id->vantage_ip_address);
+        $coordinate->vantage->latitude = $record->location->latitude;
+        $coordinate->vantage->longitude = $record->location->longitude;
+    }
+
+    $coordinates[$i] = $coordinate;
+}
+
+$array->coordinates = $coordinates;
+
+echo MongoDB\BSON\toJSON(MongoDB\BSON\fromPHP($array));
+
+/*$array = $cursor->toArray()[0]->result;
 for ($i=0; $i < count($array); ++$i) {
     $vantage = $array[$i];
 
@@ -70,5 +86,5 @@ for ($i=0; $i < count($array); ++$i) {
     echo '}';
 }
 
-echo ']}';
+echo ']}';*/
 ?>
