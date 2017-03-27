@@ -95,7 +95,7 @@ function plotMarkers(markerInfo, markers) {
 function addListener(marker, name, coordinates, ipAddresses) {
     google.maps.event.addListener(marker, 'click', function() {
         infoWindow.setContent('<div id=content>' +
-            '<strong>Name: ' + name + '</strong>' +
+            'Name: ' + name +
             '<br>Coordinates: (' + coordinates.latitude + ', ' + coordinates.longitude + ')' +
             '<br>Ip Address: ' + ipAddresses +
             '</div>');

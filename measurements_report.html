@@ -3,13 +3,13 @@ require_once 'php/vendor/autoload.php';
 require_once 'php/login.php';
 
 //parse command line parameters
-if (isset($_GET['domain'])) $domain=$_GET['domain'];
-else $domain='google.com';
-
 if (isset($_GET['duration'])) $duration=$_GET['duration'];
 else $duration=1;
 
 $timestamp = time() - ($duration * 24 * 60 * 60);
+
+if (isset($_GET['domain'])) $match_clause=['measurement_domain' => $_GET['domain'], 'timestamp' => ['$gte' => $timestamp]];
+else $match_clause=['measurement_domain' => 'google.com', 'timestamp' => ['$gte' => $timestamp]];
 
 //open driver manager and geoip reader
 $manager = new MongoDB\Driver\Manager(
@@ -27,38 +27,46 @@ $manager = new MongoDB\Driver\Manager(
 );
 $reader = new GeoIp2\Database\Reader('/usr/local/share/GeoLite2/GeoLite2-City.mmdb');
 
-//query for results
-$cursor = $manager->executeQuery(
-    'proddle.results',
-    new MongoDB\Driver\Query(
-        ['timestamp' => ['$gte' => $timestamp], 'domain' => $domain],
-        ['sort' => ['timestamp' => -1]]
+//query for measurements
+$cursor = $manager->executeCommand(
+    'proddle',
+    new MongoDB\Driver\Command(
+        [
+            'aggregate' => 'measurements',
+            'pipeline' => [
+                ['$match' => $match_clause],
+                ['$sort' => ['timestamp' => -1]],
+                ['$project' => ['headers' => 0]]
+            ]
+        ]
     )
 );
 
-//iterate over results
-echo '[';
-$array = $cursor->toArray();
-for ($i=0; $i < count($array); ++$i) {
-    $result = $array[$i];
+//geolocate vantage and effective url
+$array = $cursor->toArray()[0];
+$coordinates = [];
+for ($i=0; $i < count($array->result); ++$i) {
+    $result = $array->result[$i];
+    $coordinate = (object) array();
 
-    //gelocate ip address
-    $record = $reader->city($result->ip_address);
-    $result->latitude = $record->location->latitude;
-    $result->longitude = $record->location->longitude;
-
-    if (isset($result->result)) {
-        if (isset($result->result->domain_ip)) {
-            try {
-                $domainRecord = $reader->city($result->result->domain_ip);
-                $result->result->latitude = $domainRecord->location->latitude;
-                $result->result->longitude = $domainRecord->location->longitude;
-            } catch(Exception $e) {}
-        }
+    if (isset($result->vantage_ip_address)) {
+        $coordinate->vantage = (object) array();
+        $record = $reader->city($result->vantage_ip_address);
+        $coordinate->vantage->latitude = $record->location->latitude;
+        $coordinate->vantage->longitude = $record->location->longitude;
     }
 
-    echo ($i != 0 ? ',' : '') . MongoDB\BSON\toJSON(MongoDB\BSON\fromPHP($result));
+    if (isset($result->primary_ip_address)) {
+        $coordinate->domain = (object) array();
+        $record = $reader->city($result->primary_ip_address);
+        $coordinate->domain->latitude = $record->location->latitude;
+        $coordinate->domain->longitude = $record->location->longitude;
+    }
+
+    $coordinates[$i] = $coordinate;
 }
 
-echo ']';
+$array->coordinates = $coordinates;
+
+echo MongoDB\BSON\toJSON(MongoDB\BSON\fromPHP($array));
 ?>
